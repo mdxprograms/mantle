@@ -117,7 +117,570 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"../src/elements.json":[function(require,module,exports) {
+})({"../node_modules/pubsub.js/pubsub.js":[function(require,module,exports) {
+var global = arguments[3];
+var define;
+(function (scope) {
+  'use strict';
+
+  var pubsubInstance = null;
+  var pubsubConfig = null;
+
+  if (typeof pubsub === 'object') {
+    pubsubConfig = pubsub; //node.js config from global
+  } else if (typeof global === 'object' && typeof global.pubsubConfig === 'object') {
+    pubsubConfig = global.pubsubConfig;
+  }
+
+  function Pubsub(config) {
+    var _eventObject = {};
+    var options = {
+      separator: config && config.separator ? config.separator : '/',
+      recurrent: config && typeof config.recurrent === 'boolean' ? config.recurrent : false,
+      depth: config && typeof config.depth === 'number' ? config.depth : null,
+      async: config && typeof config.async === 'boolean' ? config.async : false,
+      context: config && config.context ? config.context : null,
+      log: config && config.log ? config.log : false
+    };
+
+    function forEach(dataArray, callback) {
+      var i = 0,
+          arrayLength = dataArray.length;
+
+      for (i = 0; i < arrayLength; i++) {
+        callback(i, dataArray[i]);
+      }
+    }
+
+    function isArray(obj) {
+      return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
+    }
+
+    function executeCallback(subscriptions, args, async) {
+      async = typeof async === 'boolean' ? async : options.async;
+
+      if (!subscriptions.length) {
+        return;
+      } // clone array - callbacks can unsubscribe other subscriptions
+      // reduces a lot performance but is safe
+
+
+      var executedSubscriptions = subscriptions.slice();
+      forEach(executedSubscriptions, function (subscriptionId, subscription) {
+        if (typeof subscription === 'object' && executedSubscriptions.hasOwnProperty(subscriptionId)) {
+          if (async) {
+            setTimeout(function () {
+              subscription.callback.apply(subscription.context, args);
+            }, 4);
+          } else {
+            subscription.callback.apply(subscription.context, args);
+          }
+        }
+      });
+    }
+
+    function executePublishWildcard(nsObject, args) {
+      var nsElement;
+
+      for (nsElement in nsObject) {
+        if (nsElement[0] !== '_' && nsObject.hasOwnProperty(nsElement)) {
+          executeCallback(nsObject[nsElement]._events, args);
+        }
+      }
+    }
+
+    function publish(nsObject, args, parts, params) {
+      // work on copy - not on reference
+      parts = parts.slice();
+      var iPart = parts.shift();
+      var depth = params.depth;
+      var async = params.async;
+      var partsLength = params.partsLength;
+      var recurrent = params.recurrent;
+      var partNumber = partsLength - parts.length; // parts is empty
+
+      if (!iPart) {
+        executeCallback(nsObject._events, args, async);
+        return;
+      } // handle subscribe wildcard
+
+
+      if (typeof nsObject['*'] !== 'undefined') {
+        publish(nsObject['*'], args, parts, params);
+      } // handle publish wildcard
+
+
+      if (iPart === '*') {
+        executePublishWildcard(nsObject, args, async);
+      } // no namespace = leave publish
+
+
+      if (typeof nsObject[iPart] === "undefined") {
+        if (params.log) {
+          console.warn('There is no ' + params.nsString + ' subscription');
+        }
+
+        return;
+      }
+
+      nsObject = nsObject[iPart];
+
+      if (recurrent === true && typeof depth !== 'number') {
+        //depth is not defined
+        executeCallback(nsObject._events, args, async);
+
+        if (parts.length === 0) {
+          return;
+        }
+      } else if (recurrent === true && typeof depth === 'number' && partNumber >= partsLength - depth) {
+        //if depth is defined
+        executeCallback(nsObject._events, args, async);
+      }
+
+      publish(nsObject, args, parts, params);
+    }
+
+    function executeSubscribeWildcard(nsObject, args, params) {
+      var parts = params.parts;
+      var async = params.async;
+      var nextPart = null;
+
+      if (parts.length === 0) {
+        executeCallback(nsObject._events, args, async);
+      } else {
+        nextPart = parts.shift();
+
+        if (nsObject[nextPart]) {
+          executeSubscribeWildcard(nsObject[nextPart], args, {
+            parts: parts,
+            async: async,
+            nsString: params.nsString
+          });
+        }
+      }
+    }
+
+    function subscribe(nsString, callback, params) {
+      var parts = nsString.split(options.separator),
+          nsObject,
+          //Namespace object to which we attach event
+      context = params && typeof params.context !== 'undefined' ? params.context : options.context,
+          eventObject = null,
+          i = 0;
+
+      if (!context) {
+        context = callback;
+      } //Iterating through _eventObject to find proper nsObject
+
+
+      nsObject = _eventObject;
+
+      for (i = 0; i < parts.length; i += 1) {
+        if (typeof nsObject[parts[i]] === "undefined") {
+          nsObject[parts[i]] = {};
+          nsObject[parts[i]]._events = [];
+        }
+
+        nsObject = nsObject[parts[i]];
+      }
+
+      eventObject = {
+        callback: callback,
+        context: context // "this" parameter in executed function
+
+      };
+
+      nsObject._events.push(eventObject);
+
+      return {
+        namespace: parts.join(options.separator),
+        event: eventObject
+      };
+    }
+
+    function unsubscribe(subscribeObject) {
+      if (subscribeObject === null || typeof subscribeObject === 'undefined') {
+        return null;
+      }
+
+      var nsString = subscribeObject.namespace,
+          eventObject = subscribeObject.event,
+          parts = nsString.split(options.separator),
+          nsObject,
+          i = 0; //Iterating through _eventObject to find proper nsObject
+
+      nsObject = _eventObject;
+
+      for (i = 0; i < parts.length; i += 1) {
+        if (typeof nsObject[parts[i]] === "undefined") {
+          if (options.log) {
+            console.error('There is no ' + nsString + ' subscription');
+          }
+
+          return null;
+        }
+
+        nsObject = nsObject[parts[i]];
+      }
+
+      forEach(nsObject._events, function (eventId) {
+        if (nsObject._events[eventId] === eventObject) {
+          nsObject._events.splice(eventId, 1);
+        }
+      });
+    }
+
+    return {
+      /**
+       * Publish event
+       * @param nsString string namespace string splited by dots
+       * @param args array of arguments given to callbacks
+       * @param params paramaters possible:
+       *        @param recurrent bool should execution be bubbled throught namespace
+       *        @param depth integer how many namespaces separated by dots will be executed
+       */
+      publish: function (nsString, args, params) {
+        var parts = nsString.split(options.separator),
+            recurrent = typeof params === 'object' && params.recurrent ? params.recurrent : options.recurrent,
+            // bubbles event throught namespace if true
+        depth = typeof params === 'object' && params.depth ? params.depth : options.depth,
+            async = typeof params === 'object' && params.async ? params.async : options.async,
+            partsLength = parts.length;
+
+        if (!parts.length) {
+          if (options.log) {
+            console.error('Wrong namespace provided ' + nsString);
+          }
+
+          return;
+        }
+
+        publish(_eventObject, args, parts, {
+          recurrent: recurrent,
+          depth: depth,
+          async: async,
+          parts: parts,
+          nsString: nsString,
+          partsLength: partsLength
+        });
+      },
+
+      /**
+       * Subscribe event
+       * @param nsString string namespace string splited by dots
+       * @param callback function function executed after publishing event
+       * @param params given params
+       *		@param context object/nothing Optional object which will be used as "this" in callback
+       */
+      subscribe: function (nsString, callback, params) {
+        var self = this,
+            subscriptions = []; // array of callbacks - multiple subscription
+
+        if (isArray(callback)) {
+          forEach(callback, function (number) {
+            var oneCallback = callback[number];
+            subscriptions = subscriptions.concat(self.subscribe(nsString, oneCallback, params));
+          }); // array of namespaces - multiple subscription
+        } else if (isArray(nsString)) {
+          forEach(nsString, function (number) {
+            var namespace = nsString[number];
+            subscriptions = subscriptions.concat(self.subscribe(namespace, callback, params));
+          });
+        } else {
+          return subscribe.apply(self, arguments);
+        }
+
+        return subscriptions;
+      },
+
+      /**
+       * subscribeOnce event - subscribe once to some event, then unsubscribe immadiately
+       * @param nsString string namespace string splited by dots
+       * @param callback function function executed after publishing event
+       * @param params given params
+       *		@param context object/nothing Optional object which will be used as "this" in callback
+       */
+      subscribeOnce: function (nsString, callback, params) {
+        var self = this,
+            subscription = null;
+
+        function subscriptionCallback() {
+          var context = this;
+          callback.apply(context, arguments);
+          self.unsubscribe(subscription);
+        }
+
+        subscription = self.subscribe(nsString, subscriptionCallback, params);
+        return subscription;
+      },
+
+      /**
+       * Unsubscribe from given subscription
+       * @param subscribeObject subscription object given on subscribe (returned from subscription)
+       */
+      unsubscribe: function (subscribeObject) {
+        var self = this; //if we have array of callbacks - multiple subscription
+
+        if (isArray(subscribeObject)) {
+          forEach(subscribeObject, function (number) {
+            var oneSubscribtion = subscribeObject[number];
+            unsubscribe.apply(self, [oneSubscribtion]);
+          });
+        } else {
+          unsubscribe.apply(self, arguments);
+        }
+      },
+
+      /**
+       * newInstance - makes new instance of pubsub object with its own config
+       * @param params instance configuration
+       *        @param separator separator (default is "/")
+       *        @param recurrent should publish events be bubbled through namespace
+       *        @param async should publish events be asynchronous - not blocking function execution
+       *        @param log console.warn/error every problem
+       */
+      newInstance: function (params) {
+        return new Pubsub(params);
+      }
+    }; //return block
+  }
+
+  pubsubInstance = new Pubsub(pubsubConfig); //if sbd's using requirejs library to load pubsub.js
+
+  if (typeof define === 'function') {
+    define(pubsubInstance);
+  } //node.js
+
+
+  if (typeof module === 'object' && module.exports) {
+    module.exports = pubsubInstance;
+  }
+
+  if (typeof window === 'object') {
+    window.pubsub = pubsubInstance;
+
+    if (window !== scope) {
+      scope.pubsub = pubsubInstance;
+    }
+  }
+})(this);
+},{}],"../node_modules/uuid/lib/rng-browser.js":[function(require,module,exports) {
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var getRandomValues = (typeof(crypto) != 'undefined' && crypto.getRandomValues && crypto.getRandomValues.bind(crypto)) ||
+                      (typeof(msCrypto) != 'undefined' && typeof window.msCrypto.getRandomValues == 'function' && msCrypto.getRandomValues.bind(msCrypto));
+
+if (getRandomValues) {
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+  var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
+
+  module.exports = function whatwgRNG() {
+    getRandomValues(rnds8);
+    return rnds8;
+  };
+} else {
+  // Math.random()-based (RNG)
+  //
+  // If all else fails, use Math.random().  It's fast, but is of unspecified
+  // quality.
+  var rnds = new Array(16);
+
+  module.exports = function mathRNG() {
+    for (var i = 0, r; i < 16; i++) {
+      if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
+      rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
+    }
+
+    return rnds;
+  };
+}
+
+},{}],"../node_modules/uuid/lib/bytesToUuid.js":[function(require,module,exports) {
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var byteToHex = [];
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1);
+}
+
+function bytesToUuid(buf, offset) {
+  var i = offset || 0;
+  var bth = byteToHex;
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return ([
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]], '-',
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]],
+    bth[buf[i++]], bth[buf[i++]]
+  ]).join('');
+}
+
+module.exports = bytesToUuid;
+
+},{}],"../node_modules/uuid/v1.js":[function(require,module,exports) {
+var rng = require('./lib/rng');
+var bytesToUuid = require('./lib/bytesToUuid');
+
+// **`v1()` - Generate time-based UUID**
+//
+// Inspired by https://github.com/LiosK/UUID.js
+// and http://docs.python.org/library/uuid.html
+
+var _nodeId;
+var _clockseq;
+
+// Previous uuid creation time
+var _lastMSecs = 0;
+var _lastNSecs = 0;
+
+// See https://github.com/uuidjs/uuid for API details
+function v1(options, buf, offset) {
+  var i = buf && offset || 0;
+  var b = buf || [];
+
+  options = options || {};
+  var node = options.node || _nodeId;
+  var clockseq = options.clockseq !== undefined ? options.clockseq : _clockseq;
+
+  // node and clockseq need to be initialized to random values if they're not
+  // specified.  We do this lazily to minimize issues related to insufficient
+  // system entropy.  See #189
+  if (node == null || clockseq == null) {
+    var seedBytes = rng();
+    if (node == null) {
+      // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+      node = _nodeId = [
+        seedBytes[0] | 0x01,
+        seedBytes[1], seedBytes[2], seedBytes[3], seedBytes[4], seedBytes[5]
+      ];
+    }
+    if (clockseq == null) {
+      // Per 4.2.2, randomize (14 bit) clockseq
+      clockseq = _clockseq = (seedBytes[6] << 8 | seedBytes[7]) & 0x3fff;
+    }
+  }
+
+  // UUID timestamps are 100 nano-second units since the Gregorian epoch,
+  // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+  // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+  // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+  var msecs = options.msecs !== undefined ? options.msecs : new Date().getTime();
+
+  // Per 4.2.1.2, use count of uuid's generated during the current clock
+  // cycle to simulate higher resolution clock
+  var nsecs = options.nsecs !== undefined ? options.nsecs : _lastNSecs + 1;
+
+  // Time since last uuid creation (in msecs)
+  var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs)/10000;
+
+  // Per 4.2.1.2, Bump clockseq on clock regression
+  if (dt < 0 && options.clockseq === undefined) {
+    clockseq = clockseq + 1 & 0x3fff;
+  }
+
+  // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+  // time interval
+  if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === undefined) {
+    nsecs = 0;
+  }
+
+  // Per 4.2.1.2 Throw error if too many uuids are requested
+  if (nsecs >= 10000) {
+    throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+  }
+
+  _lastMSecs = msecs;
+  _lastNSecs = nsecs;
+  _clockseq = clockseq;
+
+  // Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+  msecs += 12219292800000;
+
+  // `time_low`
+  var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
+  b[i++] = tl >>> 24 & 0xff;
+  b[i++] = tl >>> 16 & 0xff;
+  b[i++] = tl >>> 8 & 0xff;
+  b[i++] = tl & 0xff;
+
+  // `time_mid`
+  var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
+  b[i++] = tmh >>> 8 & 0xff;
+  b[i++] = tmh & 0xff;
+
+  // `time_high_and_version`
+  b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
+  b[i++] = tmh >>> 16 & 0xff;
+
+  // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+  b[i++] = clockseq >>> 8 | 0x80;
+
+  // `clock_seq_low`
+  b[i++] = clockseq & 0xff;
+
+  // `node`
+  for (var n = 0; n < 6; ++n) {
+    b[i + n] = node[n];
+  }
+
+  return buf ? buf : bytesToUuid(b);
+}
+
+module.exports = v1;
+
+},{"./lib/rng":"../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../node_modules/uuid/lib/bytesToUuid.js"}],"../node_modules/uuid/v4.js":[function(require,module,exports) {
+var rng = require('./lib/rng');
+var bytesToUuid = require('./lib/bytesToUuid');
+
+function v4(options, buf, offset) {
+  var i = buf && offset || 0;
+
+  if (typeof(options) == 'string') {
+    buf = options === 'binary' ? new Array(16) : null;
+    options = null;
+  }
+  options = options || {};
+
+  var rnds = options.random || (options.rng || rng)();
+
+  // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+  rnds[6] = (rnds[6] & 0x0f) | 0x40;
+  rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+  // Copy bytes to buffer, if provided
+  if (buf) {
+    for (var ii = 0; ii < 16; ++ii) {
+      buf[i + ii] = rnds[ii];
+    }
+  }
+
+  return buf || bytesToUuid(rnds);
+}
+
+module.exports = v4;
+
+},{"./lib/rng":"../node_modules/uuid/lib/rng-browser.js","./lib/bytesToUuid":"../node_modules/uuid/lib/bytesToUuid.js"}],"../node_modules/uuid/index.js":[function(require,module,exports) {
+var v1 = require('./v1');
+var v4 = require('./v4');
+
+var uuid = v4;
+uuid.v1 = v1;
+uuid.v4 = v4;
+
+module.exports = uuid;
+
+},{"./v1":"../node_modules/uuid/v1.js","./v4":"../node_modules/uuid/v4.js"}],"../src/elements.json":[function(require,module,exports) {
 module.exports = [{
   "element": "a",
   "link": "https://w3c.github.io/html/textlevel-semantics.html#the-a-element",
@@ -743,6 +1306,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 
+var _uuid = require("uuid");
+
 var _elements = _interopRequireDefault(require("./elements.json"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -762,6 +1327,7 @@ _elements.default.map(function (type) {
     var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var children = arguments.length > 1 ? arguments[1] : undefined;
     var el = Object.assign(document.createElement(type.element), _objectSpread({}, props));
+    el.mId = (0, _uuid.v4)();
 
     if (Array.isArray(children)) {
       children.flatMap(function (c) {
@@ -774,18 +1340,30 @@ _elements.default.map(function (type) {
       el.appendChild(children);
     }
 
-    el.data = {};
     return el;
   };
 });
 
 var _default = DOM;
 exports.default = _default;
-},{"./elements.json":"../src/elements.json"}],"../src/index.js":[function(require,module,exports) {
+},{"uuid":"../node_modules/uuid/index.js","./elements.json":"../src/elements.json"}],"../src/index.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
+});
+exports.Component = Component;
+Object.defineProperty(exports, "subscribe", {
+  enumerable: true,
+  get: function () {
+    return _pubsub.subscribe;
+  }
+});
+Object.defineProperty(exports, "publish", {
+  enumerable: true,
+  get: function () {
+    return _pubsub.publish;
+  }
 });
 Object.defineProperty(exports, "DOM", {
   enumerable: true,
@@ -794,6 +1372,8 @@ Object.defineProperty(exports, "DOM", {
   }
 });
 exports.map = void 0;
+
+var _pubsub = require("pubsub.js");
 
 var _dom = _interopRequireDefault(require("./dom"));
 
@@ -812,49 +1392,53 @@ var map = function map(element, data) {
 };
 
 exports.map = map;
-},{"./dom":"../src/dom.js"}],"test.js":[function(require,module,exports) {
+
+function Component(data, cb) {
+  var el = null;
+  var render = cb;
+
+  var update = function update(prevEl, newData) {
+    var nextEl = render(newData);
+    console.log(nextEl);
+
+    if (nextEl.isEqualNode(prevEl)) {
+      console.warn("no change to render");
+    } else {
+      prevEl.parentElement.replaceChild(nextEl, prevEl);
+    }
+
+    return nextEl;
+  };
+
+  var state = new Proxy(data, {
+    set: function set(target, prop, value) {
+      target[prop] = value;
+      console.log(target, prop, value);
+      el = update(el, target);
+    }
+  });
+  el = render(state);
+  return el;
+}
+},{"pubsub.js":"../node_modules/pubsub.js/pubsub.js","./dom":"../src/dom.js"}],"test.js":[function(require,module,exports) {
 "use strict";
 
 var _src = require("../src");
-
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 var main = _src.DOM.main,
     div = _src.DOM.div,
     ul = _src.DOM.ul,
     li = _src.DOM.li;
-
-function watch(data) {
-  return new Proxy(data, {
-    set: function set(target, property, value) {
-      target[property] = value;
-      return true;
-    }
-  });
-}
-
-var data = watch({
+var data = {
   people: [{
     name: "Josh"
   }, {
     name: "Annie"
   }]
-});
+};
 
 var personView = function personView(person) {
-  return li({
-    onclick: function onclick(e) {
-      data.people = [].concat(_toConsumableArray(data.people), [{
-        name: "Leo"
-      }]);
-    }
-  }, person.name);
+  return li({}, person.name);
 };
 
 var peopleList = function peopleList(people) {
@@ -863,13 +1447,17 @@ var peopleList = function peopleList(people) {
 
 var myMain = function myMain(data) {
   return main({
-    className: "orange"
+    onclick: function onclick() {
+      return data.people.push({
+        name: "bob"
+      });
+    }
   }, [div({
     className: "inner-div"
   }, peopleList(data.people))]);
 };
 
-document.body.appendChild(myMain(data));
+document.body.appendChild((0, _src.Component)(data, myMain));
 },{"../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -898,7 +1486,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59604" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59436" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

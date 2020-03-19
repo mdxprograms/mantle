@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import elementTypes from "./elements.json";
 
 let DOM = {};
@@ -5,6 +6,7 @@ let DOM = {};
 elementTypes.map(type => {
   DOM[type.element] = (props = {}, children) => {
     let el = Object.assign(document.createElement(type.element), {...props});
+    el.mId = uuidv4();
 
     if (Array.isArray(children)) {
       children.flatMap(c => el.appendChild(c));
@@ -14,8 +16,6 @@ elementTypes.map(type => {
     } else if (typeof children === "object") {
       el.appendChild(children);
     }
-
-    el.data = {};
 
     return el;
   }

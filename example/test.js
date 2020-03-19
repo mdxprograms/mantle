@@ -1,33 +1,16 @@
-import { DOM, map } from "../src";
+import { DOM, map, Component } from "../src";
 
 const { main, div, ul, li } = DOM;
 
-function watch(data) {
-  return new Proxy(data, {
-    set(target, property, value) {
-      target[property] = value;
-      return true;
-    }
-  });
-}
-
-let data = watch({
+let data = {
   people: [{ name: "Josh" }, { name: "Annie" }]
-});
+};
 
-let personView = person => li({
-  onclick(e) {
-    data.people = [...data.people, {name: "Leo"}]
-  }
-}, person.name);
+let personView = person => li({}, person.name);
 
 let peopleList = people => ul({}, map(personView, people));
 
-let myMain = data => main(
-  {
-    className: "orange"
-  },
-  [div({ className: "inner-div" }, peopleList(data.people))]
-);
+let myMain = data =>
+  main({ onclick: () => data.people.push({ name: "bob" })}, [div({ className: "inner-div" }, peopleList(data.people))]);
 
-document.body.appendChild(myMain(data));
+document.body.appendChild(Component(data, myMain));
