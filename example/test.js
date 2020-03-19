@@ -1,4 +1,4 @@
-import { DOM, map, Component } from "../src";
+import { DOM, map, subscribe, publish } from "../src";
 
 const { main, div, ul, li } = DOM;
 
@@ -6,11 +6,31 @@ let data = {
   people: [{ name: "Josh" }, { name: "Annie" }]
 };
 
-let personView = person => li({}, person.name);
+let personView = person =>
+  li(
+    {
+      onclick() {
+        publish("people/updated", [
+          { people: [...data.people, { name: "bob" }] }
+        ])
+      }
+    },
+    person.name
+  );
 
 let peopleList = people => ul({}, map(personView, people));
 
-let myMain = data =>
-  main({ onclick: () => data.people.push({ name: "bob" })}, [div({ className: "inner-div" }, peopleList(data.people))]);
+function MainView({ people }) {
+  let self = {
+    name: "main",
+    el: state => main({}, [div({ className: "inner-div" }, peopleList(state))])
+  }
 
-document.body.appendChild(Component(data, myMain));
+  subscribe("people/updated", state => {
+    document.body.replaceChild(self.el(people), self.el(state.people));
+  });
+
+  return self.el(people);
+}
+
+document.body.appendChild(MainView(data));

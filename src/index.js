@@ -11,37 +11,4 @@ const map = (element, data) => {
   }
 }
 
-function Component(data, cb) {
-  let el = null;
-
-  const render = cb;
-
-  const update = (prevEl, newData) => {
-    const nextEl = render(newData)
-
-    console.log(nextEl)
-
-    if (nextEl.isEqualNode(prevEl)) {
-      console.warn(`no change to render`) 
-    } else {
-      prevEl.parentElement.replaceChild(nextEl, prevEl);
-    }
-
-    return nextEl;
-  }
-
-  let state = new Proxy(data, {
-    set(target, prop, value) {
-      target[prop] = value;
-      console.log(target, prop, value)   
-      el = update(el, target);
-    }
-  })
-
-  el = render(state)
-
-
-  return el;
-}
-
-export { DOM, map, Component, subscribe, publish };
+export { DOM, map, subscribe, publish };

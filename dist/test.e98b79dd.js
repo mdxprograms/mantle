@@ -1352,7 +1352,6 @@ exports.default = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Component = Component;
 Object.defineProperty(exports, "subscribe", {
   enumerable: true,
   get: function () {
@@ -1392,38 +1391,18 @@ var map = function map(element, data) {
 };
 
 exports.map = map;
-
-function Component(data, cb) {
-  var el = null;
-  var render = cb;
-
-  var update = function update(prevEl, newData) {
-    var nextEl = render(newData);
-    console.log(nextEl);
-
-    if (nextEl.isEqualNode(prevEl)) {
-      console.warn("no change to render");
-    } else {
-      prevEl.parentElement.replaceChild(nextEl, prevEl);
-    }
-
-    return nextEl;
-  };
-
-  var state = new Proxy(data, {
-    set: function set(target, prop, value) {
-      target[prop] = value;
-      console.log(target, prop, value);
-      el = update(el, target);
-    }
-  });
-  el = render(state);
-  return el;
-}
 },{"pubsub.js":"../node_modules/pubsub.js/pubsub.js","./dom":"../src/dom.js"}],"test.js":[function(require,module,exports) {
 "use strict";
 
 var _src = require("../src");
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 var main = _src.DOM.main,
     div = _src.DOM.div,
@@ -1438,26 +1417,38 @@ var data = {
 };
 
 var personView = function personView(person) {
-  return li({}, person.name);
+  return li({
+    onclick: function onclick() {
+      (0, _src.publish)("people/updated", [{
+        people: [].concat(_toConsumableArray(data.people), [{
+          name: "bob"
+        }])
+      }]);
+    }
+  }, person.name);
 };
 
 var peopleList = function peopleList(people) {
   return ul({}, (0, _src.map)(personView, people));
 };
 
-var myMain = function myMain(data) {
-  return main({
-    onclick: function onclick() {
-      return data.people.push({
-        name: "bob"
-      });
+function MainView(_ref) {
+  var people = _ref.people;
+  var self = {
+    name: "main",
+    el: function el(state) {
+      return main({}, [div({
+        className: "inner-div"
+      }, peopleList(state))]);
     }
-  }, [div({
-    className: "inner-div"
-  }, peopleList(data.people))]);
-};
+  };
+  (0, _src.subscribe)("people/updated", function (state) {
+    document.body.replaceChild(self.el(people), self.el(state.people));
+  });
+  return self.el(people);
+}
 
-document.body.appendChild((0, _src.Component)(data, myMain));
+document.body.appendChild(MainView(data));
 },{"../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -1486,7 +1477,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59436" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50424" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
