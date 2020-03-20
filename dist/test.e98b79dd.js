@@ -1396,19 +1396,28 @@ exports.map = map;
 
 var _src = require("../src");
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 var main = _src.DOM.main,
     div = _src.DOM.div,
+    span = _src.DOM.span,
+    button = _src.DOM.button,
+    input = _src.DOM.input,
     ul = _src.DOM.ul,
     li = _src.DOM.li;
 var data = {
+  person: new Proxy({
+    name: ""
+  }, {
+    get: function get(obj, prop) {
+      return obj[prop] || "";
+    },
+    set: function set(target, prop, val) {
+      target[prop] = val;
+      return data;
+    },
+    name: function name() {
+      return data.person.name;
+    }
+  }),
   people: [{
     name: "Josh"
   }, {
@@ -1416,37 +1425,38 @@ var data = {
   }]
 };
 
+var removePerson = function removePerson(e) {
+  e.target.parentNode.remove();
+};
+
 var personView = function personView(person) {
-  return li({
-    onclick: function onclick() {
-      (0, _src.publish)("people/updated", [{
-        people: [].concat(_toConsumableArray(data.people), [{
-          name: "bob"
-        }])
-      }]);
-    }
-  }, person.name);
+  return li({}, [span({}, person.name), button({
+    onclick: removePerson
+  }, "Delete?")]);
 };
 
 var peopleList = function peopleList(people) {
   return ul({}, (0, _src.map)(personView, people));
 };
 
-function MainView(_ref) {
-  var people = _ref.people;
-  var self = {
-    name: "main",
-    el: function el(state) {
-      return main({}, [div({
-        className: "inner-div"
-      }, peopleList(state))]);
-    }
-  };
-  (0, _src.subscribe)("people/updated", function (state) {
-    document.body.replaceChild(self.el(people), self.el(state.people));
-  });
-  return self.el(people);
-}
+var personInput = function personInput(person) {
+  return input({
+    type: "text",
+    placeholder: "New Person",
+    onkeyup: updatePerson
+  }, person.name);
+};
+
+var updatePerson = function updatePerson(e) {
+  data.person.name = e.target.value;
+  data.people.push(data.person);
+};
+
+var MainView = function MainView(_ref) {
+  var person = _ref.person,
+      people = _ref.people;
+  return main({}, [personInput(person), div({}, data.person.name), peopleList(people)]);
+};
 
 document.body.appendChild(MainView(data));
 },{"../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
@@ -1477,7 +1487,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50424" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53568" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

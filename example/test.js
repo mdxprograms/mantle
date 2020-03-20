@@ -1,36 +1,46 @@
 import { DOM, map, subscribe, publish } from "../src";
 
-const { main, div, ul, li } = DOM;
+const { main, div, span, button, input, ul, li } = DOM;
 
 let data = {
+  person: new Proxy({ name: "" }, {
+    get(obj, prop) {
+      return obj[prop] || "";
+    },
+    set(target, prop, val) {
+      target[prop] = val;
+
+      return data;
+    },
+    name() {
+      return data.person.name;
+    }
+  }),
   people: [{ name: "Josh" }, { name: "Annie" }]
 };
 
-let personView = person =>
-  li(
-    {
-      onclick() {
-        publish("people/updated", [
-          { people: [...data.people, { name: "bob" }] }
-        ])
-      }
-    },
-    person.name
-  );
+const removePerson = e => {
+  e.target.parentNode.remove()
+}
+
+let personView = person => li({}, [
+  span({}, person.name), button({ onclick: removePerson }, "Delete?")
+]);
 
 let peopleList = people => ul({}, map(personView, people));
 
-function MainView({ people }) {
-  let self = {
-    name: "main",
-    el: state => main({}, [div({ className: "inner-div" }, peopleList(state))])
-  }
+const personInput = person => input(
+  { type: "text", placeholder: "New Person", onkeyup: updatePerson },
+  person.name
+);
 
-  subscribe("people/updated", state => {
-    document.body.replaceChild(self.el(people), self.el(state.people));
-  });
+const updatePerson = e => {
+  data.person.name = e.target.value
+  data.people.push(data.person);
+};
 
-  return self.el(people);
-}
+const MainView = ({ person, people }) => main({}, 
+ [personInput(person), div({}, data.person.name), peopleList(people)]
+);
 
 document.body.appendChild(MainView(data));
