@@ -7,12 +7,6 @@ let data = {
   people: [{ name: "Josh" }, { name: "Annie" }]
 };
 
-const peopleList = people =>
-  ul(
-    {},
-    data.people.map(p => li({ onclick: removePerson }, p.name))
-  );
-
 const setPerson = e => {
   data.person = e.target.value;
 };
@@ -30,6 +24,12 @@ const removePerson = e => {
   data.people = data.people.filter(p => p.name !== e.target.textContent)
   app.replaceChild(peopleList(data.people), ul);
 }
+
+const peopleList = people =>
+  ul(
+    {},
+    data.people.map(p => li({ onclick: removePerson }, p.name))
+  );
 
 const App = data =>
   main({ id: "app" }, [
