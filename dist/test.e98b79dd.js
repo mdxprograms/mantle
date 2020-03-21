@@ -1327,19 +1327,21 @@ _elements.default.map(function (type) {
     var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     var children = arguments.length > 1 ? arguments[1] : undefined;
     var el = Object.assign(document.createElement(type.element), _objectSpread({}, props));
+    var fragment = document.createDocumentFragment();
     el.mId = (0, _uuid.v4)();
 
     if (Array.isArray(children)) {
       children.flatMap(function (c) {
-        return el.appendChild(c);
+        return fragment.appendChild(c);
       });
     } else if (typeof children === "string") {
       var textNode = document.createTextNode(children);
-      el.appendChild(textNode);
+      fragment.appendChild(textNode);
     } else if (_typeof(children) === "object") {
-      el.appendChild(children);
+      fragment.appendChild(children);
     }
 
+    el.appendChild(fragment);
     return el;
   };
 });
@@ -1396,28 +1398,22 @@ exports.map = map;
 
 var _src = require("../src");
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 var main = _src.DOM.main,
     div = _src.DOM.div,
-    span = _src.DOM.span,
     button = _src.DOM.button,
     input = _src.DOM.input,
     ul = _src.DOM.ul,
     li = _src.DOM.li;
 var data = {
-  person: new Proxy({
-    name: ""
-  }, {
-    get: function get(obj, prop) {
-      return obj[prop] || "";
-    },
-    set: function set(target, prop, val) {
-      target[prop] = val;
-      return data;
-    },
-    name: function name() {
-      return data.person.name;
-    }
-  }),
+  person: "",
   people: [{
     name: "Josh"
   }, {
@@ -1425,40 +1421,47 @@ var data = {
   }]
 };
 
-var removePerson = function removePerson(e) {
-  e.target.parentNode.remove();
-};
-
-var personView = function personView(person) {
-  return li({}, [span({}, person.name), button({
-    onclick: removePerson
-  }, "Delete?")]);
-};
-
 var peopleList = function peopleList(people) {
-  return ul({}, (0, _src.map)(personView, people));
+  return ul({}, data.people.map(function (p) {
+    return li({
+      onclick: removePerson
+    }, p.name);
+  }));
 };
 
-var personInput = function personInput(person) {
-  return input({
-    type: "text",
-    placeholder: "New Person",
-    onkeyup: updatePerson
-  }, person.name);
+var setPerson = function setPerson(e) {
+  data.person = e.target.value;
 };
 
-var updatePerson = function updatePerson(e) {
-  data.person.name = e.target.value;
-  data.people.push(data.person);
+var addPerson = function addPerson() {
+  var app = document.getElementById("app");
+  var ul = app.querySelector("ul");
+  data.people = [].concat(_toConsumableArray(data.people), [{
+    name: data.person
+  }]);
+  app.replaceChild(peopleList(data.people), ul);
 };
 
-var MainView = function MainView(_ref) {
-  var person = _ref.person,
-      people = _ref.people;
-  return main({}, [personInput(person), div({}, data.person.name), peopleList(people)]);
+var removePerson = function removePerson(e) {
+  var app = document.getElementById("app");
+  var ul = app.querySelector("ul");
+  data.people = data.people.filter(function (p) {
+    return p.name !== e.target.textContent;
+  });
+  app.replaceChild(peopleList(data.people), ul);
 };
 
-document.body.appendChild(MainView(data));
+var App = function App(data) {
+  return main({
+    id: "app"
+  }, [div({}, [input({
+    oninput: setPerson
+  }, data.person), button({
+    onclick: addPerson
+  }, "Add")]), peopleList(data.people)]);
+};
+
+document.body.appendChild(App(data));
 },{"../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -1487,7 +1490,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53568" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58798" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

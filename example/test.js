@@ -1,46 +1,43 @@
-import { DOM, map, subscribe, publish } from "../src";
+import { DOM } from "../src";
 
-const { main, div, span, button, input, ul, li } = DOM;
+const { main, div, button, input, ul, li } = DOM;
 
 let data = {
-  person: new Proxy({ name: "" }, {
-    get(obj, prop) {
-      return obj[prop] || "";
-    },
-    set(target, prop, val) {
-      target[prop] = val;
-
-      return data;
-    },
-    name() {
-      return data.person.name;
-    }
-  }),
+  person: "",
   people: [{ name: "Josh" }, { name: "Annie" }]
 };
 
-const removePerson = e => {
-  e.target.parentNode.remove()
-}
+const peopleList = people =>
+  ul(
+    {},
+    data.people.map(p => li({ onclick: removePerson }, p.name))
+  );
 
-let personView = person => li({}, [
-  span({}, person.name), button({ onclick: removePerson }, "Delete?")
-]);
-
-let peopleList = people => ul({}, map(personView, people));
-
-const personInput = person => input(
-  { type: "text", placeholder: "New Person", onkeyup: updatePerson },
-  person.name
-);
-
-const updatePerson = e => {
-  data.person.name = e.target.value
-  data.people.push(data.person);
+const setPerson = e => {
+  data.person = e.target.value;
 };
 
-const MainView = ({ person, people }) => main({}, 
- [personInput(person), div({}, data.person.name), peopleList(people)]
-);
+const addPerson = () => {
+  const app = document.getElementById("app");
+  const ul = app.querySelector("ul");
+  data.people = [...data.people, { name: data.person }];
+  app.replaceChild(peopleList(data.people), ul);
+};
 
-document.body.appendChild(MainView(data));
+const removePerson = e => {
+  const app = document.getElementById("app");
+  const ul = app.querySelector("ul");
+  data.people = data.people.filter(p => p.name !== e.target.textContent)
+  app.replaceChild(peopleList(data.people), ul);
+}
+
+const App = data =>
+  main({ id: "app" }, [
+    div({}, [
+      input({ oninput: setPerson }, data.person),
+      button({ onclick: addPerson }, "Add")
+    ]),
+    peopleList(data.people)
+  ]);
+
+document.body.appendChild(App(data));

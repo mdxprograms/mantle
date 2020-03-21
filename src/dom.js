@@ -1,24 +1,26 @@
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import elementTypes from "./elements.json";
 
 let DOM = {};
 
 elementTypes.map(type => {
   DOM[type.element] = (props = {}, children) => {
-    let el = Object.assign(document.createElement(type.element), {...props});
+    let el = Object.assign(document.createElement(type.element), { ...props });
+    let fragment = document.createDocumentFragment();
     el.mId = uuidv4();
 
     if (Array.isArray(children)) {
-      children.flatMap(c => el.appendChild(c));
+      children.flatMap(c => fragment.appendChild(c));
     } else if (typeof children === "string") {
       let textNode = document.createTextNode(children);
-      el.appendChild(textNode);
+      fragment.appendChild(textNode);
     } else if (typeof children === "object") {
-      el.appendChild(children);
+      fragment.appendChild(children);
     }
 
+    el.appendChild(fragment);
     return el;
-  }
+  };
 });
 
 export default DOM;
