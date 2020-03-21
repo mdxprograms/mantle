@@ -21,9 +21,9 @@ const addPerson = () => {
 const removePerson = e => {
   const app = document.getElementById("app");
   const ul = app.querySelector("ul");
-  data.people = data.people.filter(p => p.name !== e.target.textContent)
+  data.people = data.people.filter(p => p.name !== e.target.textContent);
   app.replaceChild(peopleList(data.people), ul);
-}
+};
 
 const peopleList = people =>
   ul(
