@@ -1022,20 +1022,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var _src = require("../src");
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
 var main = _src.DOM.main,
     div = _src.DOM.div,
     button = _src.DOM.button,
     input = _src.DOM.input,
     ul = _src.DOM.ul,
     li = _src.DOM.li;
+
+var Root = function Root() {
+  return document.getElementById("app");
+};
+
+var update = function update() {
+  return Root().replaceWith(App(data));
+};
+
 var data = {
   person: "",
   people: [{
@@ -1044,27 +1045,28 @@ var data = {
     name: "Annie"
   }]
 };
+var addPersonBtn = button({
+  onclick: function onclick() {
+    data.people.push({
+      name: data.person
+    });
+    data.person = "";
+    update();
+  }
+}, "Add");
 
-var setPerson = function setPerson(e) {
-  data.person = e.target.value;
-};
-
-var addPerson = function addPerson() {
-  var app = document.getElementById("app");
-  var ul = app.querySelector("ul");
-  data.people = [].concat(_toConsumableArray(data.people), [{
-    name: data.person
-  }]);
-  app.replaceChild(peopleList(data.people), ul);
+var personInput = function personInput(person) {
+  return input({
+    onkeyup: function onkeyup(e) {
+      return data.person = e.target.value;
+    }
+  }, person);
 };
 
 var removePerson = function removePerson(e) {
-  var app = document.getElementById("app");
-  var ul = app.querySelector("ul");
   data.people = data.people.filter(function (p) {
     return p.name !== e.target.textContent;
   });
-  app.replaceChild(peopleList(data.people), ul);
 };
 
 var peopleList = function peopleList(people) {
@@ -1078,14 +1080,10 @@ var peopleList = function peopleList(people) {
 var App = function App(data) {
   return main({
     id: "app"
-  }, [div({}, [input({
-    oninput: setPerson
-  }, data.person), button({
-    onclick: addPerson
-  }, "Add")]), peopleList(data.people)]);
+  }, [div({}, [personInput(data.person), addPersonBtn]), peopleList(data.people)]);
 };
 
-document.body.appendChild(App(data));
+Root().appendChild(App(data));
 },{"../src":"../src/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -1114,7 +1112,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55160" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65159" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

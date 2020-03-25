@@ -14,5 +14,7 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "deepmerge": "^4.2.2"
+  }
 }

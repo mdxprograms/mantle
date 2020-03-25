@@ -2,27 +2,31 @@ import { DOM } from "../src";
 
 const { main, div, button, input, ul, li } = DOM;
 
+const Root = () => document.getElementById("app");
+
+const update = () => Root().replaceWith(App(data));
+
 let data = {
   person: "",
   people: [{ name: "Josh" }, { name: "Annie" }]
 };
 
-const setPerson = e => {
-  data.person = e.target.value;
-};
+const addPersonBtn = button(
+  {
+    onclick: () => {
+      data.people.push({ name: data.person });
+      data.person = "";
+      update();
+    }
+  },
+  "Add"
+);
 
-const addPerson = () => {
-  const app = document.getElementById("app");
-  const ul = app.querySelector("ul");
-  data.people = [...data.people, { name: data.person }];
-  app.replaceChild(peopleList(data.people), ul);
-};
+const personInput = person =>
+  input({ onkeyup: e => (data.person = e.target.value) }, person);
 
 const removePerson = e => {
-  const app = document.getElementById("app");
-  const ul = app.querySelector("ul");
   data.people = data.people.filter(p => p.name !== e.target.textContent);
-  app.replaceChild(peopleList(data.people), ul);
 };
 
 const peopleList = people =>
@@ -33,11 +37,8 @@ const peopleList = people =>
 
 const App = data =>
   main({ id: "app" }, [
-    div({}, [
-      input({ oninput: setPerson }, data.person),
-      button({ onclick: addPerson }, "Add")
-    ]),
+    div({}, [personInput(data.person), addPersonBtn]),
     peopleList(data.people)
   ]);
 
-document.body.appendChild(App(data));
+Root().appendChild(App(data));
