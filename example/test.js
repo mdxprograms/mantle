@@ -1,4 +1,4 @@
-import { DOM } from "../src";
+import { DOM, mount } from "../src";
 
 const { article, main, div, button, input, ul, li, span } = DOM;
 
@@ -19,6 +19,7 @@ const addPersonBtn = button(
     onclick: () => {
       data.people.push({ name: data.person });
       data.person = "";
+      console.log(this)
       update();
     }
   },
@@ -40,7 +41,7 @@ const removePersonBtn = name =>
 const peopleList = people =>
   ul(
     { className: "list pl3 pv3 lw6 ba b--light-silver br2" },
-    data.people.map(p =>
+    people.map(p =>
       li({}, [span({ className: "mr2" }, p.name), removePersonBtn(p.name)])
     )
   );
@@ -48,7 +49,7 @@ const peopleList = people =>
 const App = data =>
   main({ id: "app" }, [
     div({}, [personInput(data.person), addPersonBtn]),
-    article({ className: "pa3 pa5-ns"}, [peopleList(data.people)])
+    article({ className: "pa3 pa5-ns" }, [peopleList(data.people)])
   ]);
 
-Root().appendChild(App(data));
+mount(Root(), App(data));

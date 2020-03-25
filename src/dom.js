@@ -7,7 +7,8 @@ elementTypes.map(type => {
   DOM[type.element] = (props = {}, children) => {
     let el = Object.assign(document.createElement(type.element), { ...props });
     let fragment = document.createDocumentFragment();
-    el.mId = uuidv4();
+
+    el.mId = !("mId" in props) ? uuidv4() : props.mId;
 
     if (Array.isArray(children)) {
       children.flatMap(c => fragment.appendChild(c));
