@@ -1022,12 +1022,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var _src = require("../src");
 
-var main = _src.DOM.main,
+var article = _src.DOM.article,
+    main = _src.DOM.main,
     div = _src.DOM.div,
     button = _src.DOM.button,
     input = _src.DOM.input,
     ul = _src.DOM.ul,
-    li = _src.DOM.li;
+    li = _src.DOM.li,
+    span = _src.DOM.span;
 
 var Root = function Root() {
   return document.getElementById("app");
@@ -1045,6 +1047,15 @@ var data = {
     name: "Annie"
   }]
 };
+
+var personInput = function personInput(person) {
+  return input({
+    onkeyup: function onkeyup(e) {
+      return data.person = e.target.value;
+    }
+  }, person);
+};
+
 var addPersonBtn = button({
   onclick: function onclick() {
     data.people.push({
@@ -1055,32 +1066,34 @@ var addPersonBtn = button({
   }
 }, "Add");
 
-var personInput = function personInput(person) {
-  return input({
-    onkeyup: function onkeyup(e) {
-      return data.person = e.target.value;
+var removePersonBtn = function removePersonBtn(name) {
+  return button({
+    className: "f6 link dim br1 ph3 pv2 dib black bg-dark-red pointer",
+    onclick: function onclick(e) {
+      data.people = data.people.filter(function (p) {
+        return p.name !== name;
+      });
+      update();
     }
-  }, person);
-};
-
-var removePerson = function removePerson(e) {
-  data.people = data.people.filter(function (p) {
-    return p.name !== e.target.textContent;
-  });
+  }, "Delete?");
 };
 
 var peopleList = function peopleList(people) {
-  return ul({}, data.people.map(function (p) {
-    return li({
-      onclick: removePerson
-    }, p.name);
+  return ul({
+    className: "list pl3 pv3 lw6 ba b--light-silver br2"
+  }, data.people.map(function (p) {
+    return li({}, [span({
+      className: "mr2"
+    }, p.name), removePersonBtn(p.name)]);
   }));
 };
 
 var App = function App(data) {
   return main({
     id: "app"
-  }, [div({}, [personInput(data.person), addPersonBtn]), peopleList(data.people)]);
+  }, [div({}, [personInput(data.person), addPersonBtn]), article({
+    className: "pa3 pa5-ns"
+  }, [peopleList(data.people)])]);
 };
 
 Root().appendChild(App(data));
@@ -1112,7 +1125,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65159" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52919" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
