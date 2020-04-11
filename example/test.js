@@ -9,6 +9,11 @@ const update = () => Root().querySelector("#app-root").replaceWith(App(state));
 const state = new State({
   person: "",
   people: [],
+  comments: {
+    current: "",
+    count: 0,
+    all: []
+  }
 });
 
 const handlePerson = (e) => state.update("person", e.target.value);
@@ -40,6 +45,12 @@ const removePersonBtn = () =>
     "Delete?"
   );
 
+const handleNewComment = e => {
+  if (e.targt.value.length >= 2) {
+    state.update("comments.current", e.targt.value)
+  }
+}
+
 const peopleList = (people) =>
   ul(
     { className: "list pl3 pv3 lw6 ba b--light-silver br2" },
@@ -48,7 +59,7 @@ const peopleList = (people) =>
     )
   );
 
-console.log(state)
+console.log(state.get("comments"))
 
 const App = (state) =>
   main({ id: "app-root" }, [
