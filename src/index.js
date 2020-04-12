@@ -1,3 +1,4 @@
+import State from "./State";
 import DOM from "./dom";
 
 const createTreeItem = el => ({
@@ -14,24 +15,9 @@ const createTreeItem = el => ({
 const createTree = container =>
   [...container.querySelectorAll("*")].map(createTreeItem);
 
-export class State {
-  constructor(initialState = {}) {
-    this.current = initialState;
-  }
-
-  update(statePath, value) {
-    console.log(statePath, value)
-    this.current[statePath] = value;
-  }
-
-  get(key) {
-    return this.current[key];
-  }
-}
-
 const mount = (el, container) => {
   const tree = createTree(container);
   el.appendChild(container);
 };
 
-export { DOM, mount };
+export { DOM, mount, State };
