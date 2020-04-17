@@ -1,23 +1,26 @@
-import State from "./State";
+import onChange from "on-change";
 import DOM from "./dom";
+import { createTreeItem, createTree } from "./tree";
 
-const createTreeItem = el => ({
-  mId: el.mId,
-  parentId: el.parentNode.mId || null,
-  order: Array.from(el.parentNode.childNodes).indexOf(el),
-  type: el.localName,
-  attributes: [...el.attributes].map(attr => ({
-    key: attr.localName,
-    value: attr.value
-  }))
-});
+let currentState = {};
+let tree = [];
 
-const createTree = container =>
-  [...container.querySelectorAll("*")].map(createTreeItem);
+const setState = (state) =>
+  onChange(state, function (path, value, previousValue) {
+    console.log("changed");
+    console.log(path, previousValue, value);
+    let found = tree.find(
+      ({ el }) => el.textContent === previousValue || el.value === previousValue
+    );
+    console.log(found);
+  });
 
-const mount = (el, container) => {
-  const tree = createTree(container);
-  el.appendChild(container);
+const mount = (el, container, state) => {
+  currentState = setState(state);
+  const base = container(currentState);
+  tree = createTree(base);
+
+  el.appendChild(base);
 };
 
-export { DOM, mount, State };
+export { DOM, mount, currentState };
