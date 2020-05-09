@@ -1,37 +1,22 @@
-import { DOM, mount, currentState } from "../src";
+import { DOM, mount, dispatch } from "../src";
 
-const { article, main, div, button, input, ul, li, span } = DOM;
+const { main, div, input } = DOM;
 
-const Root = () => document.getElementById("app");
+const Root = document.getElementById("app");
 
-let initialState = {
-  person: "leroy",
-  people: [],
-  comments: {
-    current: "",
-    count: 0,
-    all: [],
+const personInput = input(
+  {
+    onkeyup: (e) => dispatch("person:update", e.target.value),
   },
-};
+  ""
+);
 
-const dispatch = (event, detail) => new CustomEvent(event, detail);
+const testOutput = div({
+  "person:update": (val) => (testOutput.textContent = val),
+});
 
-const personInput = (person) =>
-  input(
-    {
-      "prop:person": person,
-      onkeyup: function (e) {
-        e.target.dispatchEvent(
-          dispatch("prop:person", { detail: e.target.value })
-        );
-      },
-    },
-    ""
-  );
+const container = div({ className: "container" }, [personInput, testOutput]);
 
-const container = (state) =>
-  div({ className: state.person }, personInput(state.person));
+const App = main({ id: "app-root" }, container);
 
-const App = (state) => main({ id: "app-root" }, [container(state)]);
-
-mount(Root(), App, initialState);
+mount(Root, App);

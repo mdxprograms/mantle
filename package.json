@@ -15,7 +15,5 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.4"
   },
-  "dependencies": {
-    "on-change": "^2.0.1"
-  }
+  "dependencies": {}
 }

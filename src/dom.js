@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 import elementTypes from "./elements.json";
-import Observer from "./observer";
 
 let DOM = {};
 
@@ -9,10 +8,12 @@ elementTypes.map((type) => {
     let el = Object.assign(document.createElement(type.element), { ...props });
     let fragment = document.createDocumentFragment();
 
-    const validProps = Object.keys(props)
-      .filter((key) => key.includes("prop:"))
-      .map((k, i) => {
-        el.addEventListener(k, (e) => el.setAttribute(k, e.detail));
+    Object.keys(props)
+      .filter((key) => key.includes(":"))
+      .forEach((k, i) => {
+        document.addEventListener(k, (e) => {
+          el[`${k}`](e.detail);
+        });
       });
 
     el.mId = !("mId" in props) ? uuidv4() : props.mId;
@@ -27,7 +28,6 @@ elementTypes.map((type) => {
     }
 
     el.appendChild(fragment);
-    Observer(el);
 
     return el;
   };
