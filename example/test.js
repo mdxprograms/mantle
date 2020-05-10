@@ -15,17 +15,25 @@ const addPersonBtn = button(
   "Add person"
 );
 
-const personListEvents = {
+const personList = ul({
   "person:added": (val) =>
     personList.appendChild(
       li({ onclick: (e) => dispatch("person:removed", e.target) }, val)
     ),
   "person:removed": (li) => li.remove(),
-};
+});
 
-const personList = ul(personListEvents, li({}, "First child"));
+const notify = div(
+  {
+    "person:added": (val) => (notify.textContent = `${val} was added`),
+    "person:removed": (li) =>
+      (notify.textContent = `${li.textContent} was removed.`),
+  },
+  "No new notifications"
+);
 
 const container = div({ className: "container" }, [
+  notify,
   personInput,
   addPersonBtn,
   personList,
