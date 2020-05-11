@@ -1,36 +1,35 @@
 import { DOM, mount, dispatch } from "../src";
+import { notify } from "./notifications";
 
 const { main, div, input, button, ul, li } = DOM;
 
 const Root = document.getElementById("app");
 
 const personInput = input({
-  onkeyup: (e) => dispatch("person:update", e.target.value),
+  "person:added"() {
+    this.value = "";
+  },
 });
 
 const addPersonBtn = button(
   {
-    onclick: () => dispatch("person:added", personInput.value),
+    onclick: () => {
+      dispatch("person:added", personInput.value);
+    },
   },
   "Add person"
 );
 
 const personList = ul({
-  "person:added": (val) =>
-    personList.appendChild(
+  "person:added"(val) {
+    this.appendChild(
       li({ onclick: (e) => dispatch("person:removed", e.target) }, val)
-    ),
-  "person:removed": (li) => li.remove(),
-});
-
-const notify = div(
-  {
-    "person:added": (val) => (notify.textContent = `${val} was added`),
-    "person:removed": (li) =>
-      (notify.textContent = `${li.textContent} was removed.`),
+    );
   },
-  "No new notifications"
-);
+  "person:removed"(li) {
+    li.remove();
+  },
+});
 
 const container = div({ className: "container" }, [
   notify,
