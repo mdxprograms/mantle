@@ -5,6 +5,7 @@ const { main, div, input, button, ul, li } = DOM;
 
 const Root = document.getElementById("app");
 
+// Ideas and todos
 // @TODO: Use global listener options
 // dispatch("globalname:function", val);
 // map second portion of colon to function?
@@ -12,9 +13,17 @@ const Root = document.getElementById("app");
 //   validatePerson: (val) => val.length > 0
 // };
 
+// const Mantle = {
+//   validateInput(val) {
+//     if (val.length < 2) {
+
+//     }
+//   }
+// }
+
 const personInput = input({
   onkeyup(e) {
-    dispatch("person:validate", e.target.value); 
+    dispatch("Mantle:validateInput", e.target.value); 
   },
   "person:added"() {
     this.value = "";
