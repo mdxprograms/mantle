@@ -7,12 +7,20 @@
   "scripts": {
     "start": "parcel example/index.html -p 3000",
     "build": "rm -rf dist && parcel build src/index.js",
+    "fix:scripts": "eslint --fix src/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run fix:scripts"
+    }
+  },
   "keywords": [],
-  "author": "",
+  "author": "Josh Waller <mdx.programs@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "eslint": "^7.0.0",
+    "husky": "^4.2.5",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
