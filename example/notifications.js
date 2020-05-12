@@ -10,10 +10,10 @@ const notifyEvent = (ctx, msg) => {
 export const notify = div(
   {
     "person:added"(val) {
-      notifyEvent(this, `${val} was added`);
+      notifyEvent(notify, `${val} was added`);
     },
     "person:removed"(li) {
-      notifyEvent(this, `${li.textContent} was removed.`);
+      notifyEvent(notify, `${li.textContent} was removed.`);
     },
   },
   "Notifications"

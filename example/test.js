@@ -5,28 +5,9 @@ const { main, div, input, button, ul, li } = DOM;
 
 const Root = document.getElementById("app");
 
-// Ideas and todos
-// @TODO: Use global listener options
-// dispatch("globalname:function", val);
-// map second portion of colon to function?
-// const actionListeners = {
-//   validatePerson: (val) => val.length > 0
-// };
-
-// const Mantle = {
-//   validateInput(val) {
-//     if (val.length < 2) {
-
-//     }
-//   }
-// }
-
 const personInput = input({
-  onkeyup(e) {
-    dispatch("Mantle:validateInput", e.target.value); 
-  },
   "person:added"() {
-    this.value = "";
+    personInput.value = "";
   },
 });
 
@@ -41,7 +22,7 @@ const addPersonBtn = button(
 
 const personList = ul({
   "person:added"(val) {
-    this.appendChild(
+    personList.appendChild(
       li({ onclick: (e) => dispatch("person:removed", e.target) }, val)
     );
   },
