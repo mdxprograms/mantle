@@ -15,5 +15,7 @@
   "devDependencies": {
     "parcel-bundler": "^1.12.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "nanobus": "^4.4.0"
+  }
 }

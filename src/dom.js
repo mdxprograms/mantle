@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import elementTypes from "./elements.json";
+import { on } from "./emitter";
 
 let DOM = {};
 
@@ -10,10 +11,8 @@ elementTypes.map((type) => {
 
     Object.keys(props)
       .filter((key) => key.includes(":"))
-      .forEach((k, i) => {
-        document.addEventListener(k, (e) => {
-          el[`${k}`](e.detail);
-        });
+      .forEach((k) => {
+        on(k, el[`${k}`]);
       });
 
     el.mId = !("mId" in props) ? uuidv4() : props.mId;
