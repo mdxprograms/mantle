@@ -2,11 +2,11 @@ import DOM from "./dom";
 import { dispatch, on } from "./emitter";
 
 class Mantle {
-  constructor() {
+  constructor () {
     this.plugins = {};
   }
 
-  addPlugin(plugin) {
+  addPlugin (plugin) {
     if (Object.keys(this.plugins).find((p) => p.name === plugin.name)) {
       throw new Error(`Plugin exists: ${plugin.name}`);
     }
@@ -16,7 +16,7 @@ class Mantle {
     return this.plugins;
   }
 
-  setPlugins(plugins) {
+  setPlugins (plugins) {
     plugins.map((p) => this.addPlugin(p));
 
     return this.plugins;
