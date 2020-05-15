@@ -1,20 +1,48 @@
-import { DOM, mount, dispatch } from "../src";
+import { DOM, mount, dispatch, Mantle } from "../src";
 import { notify } from "./notifications";
 
+// Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
 
-const Root = document.getElementById("app");
+// Intialize Mantle for core features, (plugins, built in functions)
+const m = new Mantle();
 
+// Plugins either installed or local can be applied like the following
+const TC = {
+  name: "titleCase",
+  onValue: (val) =>
+    val
+      .split(" ")
+      .map((w) => `${w[0].toUpperCase()}${w.substr(1).toLowerCase()}`)
+      .join(" "),
+};
+
+const ToURL = {
+  name: "toUrl",
+  onValue: (val) => val.split(" ").join("-"),
+};
+
+/*
+ * Plugins are objects with a name and an onValue function
+ * Initial Plugin names should be capitalized to avoid destructuring issues
+ */
+let { titleCase, toUrl } = m.setPlugins([TC, ToURL]);
+
+/*
+ * Functions defined with : are automatically mapped to dispatch and
+ * receive the dispatched value
+ */
 const personInput = input({
   "person:added"() {
     personInput.value = "";
   },
 });
 
+// Use dispatch to send an event
 const addPersonBtn = button(
   {
     onclick: () => {
-      dispatch("person:added", personInput.value);
+      dispatch("person:added", titleCase(personInput.value));
     },
   },
   "Add person"
@@ -40,4 +68,4 @@ const container = div({ className: "container" }, [
 
 const App = main({ id: "app-root" }, container);
 
-mount(Root, App);
+mount(document.getElementById("app"), App);
