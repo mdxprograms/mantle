@@ -8,7 +8,7 @@
     "start": "parcel example/index.html -p 3000",
     "build": "rm -rf dist && parcel build src/index.js",
     "fix:scripts": "eslint --fix src/",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cypress open"
   },
   "husky": {
     "hooks": {
@@ -19,6 +19,7 @@
   "author": "Josh Waller <mdx.programs@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "cypress": "^4.5.0",
     "eslint": "^7.0.0",
     "husky": "^4.2.5",
     "parcel-bundler": "^1.12.4"

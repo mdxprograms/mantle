@@ -9,6 +9,7 @@ const notifyEvent = (ctx, msg) => {
 
 export const notify = div(
   {
+    className: "notifications",
     "person:added"(val) {
       notifyEvent(notify, `${val} was added`);
     },

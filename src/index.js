@@ -27,4 +27,6 @@ const mount = (el, container) => {
   el.appendChild(container);
 };
 
-export { DOM, mount, dispatch, on, Mantle };
+const m = new Mantle();
+
+export { DOM, mount, dispatch, on, m };
