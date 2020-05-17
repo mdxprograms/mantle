@@ -8,6 +8,17 @@ Principals:
 - Minimal markup
 - Event system over state machine
 
+## Local Setup
+- `nvm install && nvm use`
+- `npm i`
+- `npm start`
+
+## UI tests
+- `npm run test` (will start cypress)
+
+## Build
+- `npm run build`
+
 ## Examples
 
 #### Adding and removing people from a list

@@ -7,64 +7,64 @@ const { main, div, input, button, ul, li } = DOM;
 
 // Plugins either installed or local can be applied like the following
 const TC = {
-  "name": "titleCase",
-  "onValue": (val) => val
+  name: "titleCase",
+  onValue: (val) =>
+    val
       .split(" ")
       .map((w) => `${w[0].toUpperCase()}${w.substr(1).toLowerCase()}`)
-      .join(" ")
+      .join(" "),
 };
 
 const ToURL = {
-  "name": "toUrl",
-  "onValue": (val) => val.split(" ").join("-")
+  name: "toUrl",
+  onValue: (val) => val.split(" ").join("-"),
 };
 
 /*
  * Plugins are objects with a name and an onValue function
  * Initial Plugin names should be capitalized to avoid destructuring issues
  */
-let { titleCase } = m.setPlugins([
-  TC,
-  ToURL
-]);
+let { titleCase } = m.setPlugins([TC, ToURL]);
 
 /*
  * Functions defined with : are automatically mapped to dispatch and
  * receive the dispatched value
  */
 const personInput = input({
-  "person:added" () {
+  "person:added"() {
     personInput.value = "";
-  }
+  },
 });
 
 // Use dispatch to send an event
 const addPersonBtn = button(
   {
-    "onclick": () => {
+    onclick: () => {
       dispatch("person:added", titleCase(personInput.value));
-    }
+    },
   },
   "Add person"
 );
 
 const personList = ul({
-  "person:added" (val) {
+  "person:added"(val) {
     // eslint-disable-next-line max-len
-    personList.appendChild(li({ "onclick": (e) => dispatch("person:removed", e.target) }, val));
+    personList.appendChild(
+      li({ onclick: (e) => dispatch("person:removed", e.target) }, val)
+    );
   },
-  "person:removed" (child) {
+  "person:removed"(child) {
     child.remove();
-  }
+  },
 });
 
-const container = div({ "className": "container" }, [
+const container = div({ className: "container" }, [
   notify,
   personInput,
   addPersonBtn,
-  personList
+  personList,
 ]);
 
-const App = main({ "id": "app-root" }, container);
+const App = main({ id: "app-root" }, container);
 
 mount(document.getElementById("app"), App);
