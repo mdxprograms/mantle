@@ -1,4 +1,5 @@
 import { DOM } from "../src";
+import { personAdded, personRemoved } from "./events";
 
 const { div } = DOM;
 
@@ -10,12 +11,9 @@ const notifyEvent = (ctx, msg) => {
 export const notify = div(
   {
     className: "notifications",
-    "person:added"(val) {
-      notifyEvent(notify, `${val} was added`);
-    },
-    "person:removed"(li) {
-      notifyEvent(notify, `${li.textContent} was removed.`);
-    },
+    [personAdded]: (val) => notifyEvent(notify, `${val} was added`),
+    [personRemoved]: (li) =>
+      notifyEvent(notify, `${li.textContent} was removed.`),
   },
   "Notifications"
 );

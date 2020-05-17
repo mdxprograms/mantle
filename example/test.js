@@ -1,5 +1,6 @@
 import { DOM, mount, dispatch, m } from "../src";
 import { notify } from "./notifications";
+import { personAdded, personRemoved } from "./events";
 
 // Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
@@ -27,13 +28,14 @@ let { titleCase } = m.setPlugins([TC, ToURL]);
 
 /*
  * Functions defined with : are automatically mapped to dispatch and
- * receive the dispatched value
+ * receive the dispatched value.
+ * /examples/events.js defines event names for easier access across other files
  */
 const personInput = input({
-  "person:added": () => (personInput.value = ""),
+  [personAdded]: () => (personInput.value = ""),
   onkeydown: ({ key, target }) => {
     if (key === "Enter") {
-      dispatch("person:added", titleCase(target.value));
+      dispatch(personAdded, titleCase(target.value));
     }
   },
 });
@@ -41,17 +43,17 @@ const personInput = input({
 // Use dispatch to send an event
 const addPersonBtn = button(
   {
-    onclick: () => dispatch("person:added", titleCase(personInput.value)),
+    onclick: () => dispatch(personAdded, titleCase(personInput.value)),
   },
   "Add person"
 );
 
 const personList = ul({
-  "person:added": (val) =>
+  [personAdded]: (val) =>
     personList.appendChild(
-      li({ onclick: ({ target }) => dispatch("person:removed", target) }, val)
+      li({ onclick: ({ target }) => dispatch(personRemoved, target) }, val)
     ),
-  "person:removed": (child) => child.remove(),
+  [personRemoved]: (child) => child.remove(),
 });
 
 const container = div({ className: "container" }, [
