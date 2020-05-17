@@ -50,7 +50,7 @@ const personList = ul({
   "person:added"(val) {
     // eslint-disable-next-line max-len
     personList.appendChild(
-      li({ onclick: (e) => dispatch("person:removed", e.target) }, val)
+      li({ onclick: ({ target }) => dispatch("person:removed", target) }, val)
     );
   },
   "person:removed"(child) {
