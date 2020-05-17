@@ -34,14 +34,17 @@ const personInput = input({
   "person:added"() {
     personInput.value = "";
   },
+  onkeydown({ key, target }) {
+    if (key === "Enter") {
+      dispatch("person:added", titleCase(target.value));
+    }
+  },
 });
 
 // Use dispatch to send an event
 const addPersonBtn = button(
   {
-    onclick: () => {
-      dispatch("person:added", titleCase(personInput.value));
-    },
+    onclick: () => dispatch("person:added", titleCase(personInput.value)),
   },
   "Add person"
 );
