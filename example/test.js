@@ -1,4 +1,3 @@
-/* eslint-disable no-magic-numbers */
 import { DOM, mount, dispatch, m } from "../src";
 import { notify } from "./notifications";
 
@@ -31,10 +30,8 @@ let { titleCase } = m.setPlugins([TC, ToURL]);
  * receive the dispatched value
  */
 const personInput = input({
-  "person:added"() {
-    personInput.value = "";
-  },
-  onkeydown({ key, target }) {
+  "person:added": () => (personInput.value = ""),
+  onkeydown: ({ key, target }) => {
     if (key === "Enter") {
       dispatch("person:added", titleCase(target.value));
     }
@@ -50,15 +47,11 @@ const addPersonBtn = button(
 );
 
 const personList = ul({
-  "person:added"(val) {
-    // eslint-disable-next-line max-len
+  "person:added": (val) =>
     personList.appendChild(
       li({ onclick: ({ target }) => dispatch("person:removed", target) }, val)
-    );
-  },
-  "person:removed"(child) {
-    child.remove();
-  },
+    ),
+  "person:removed": (child) => child.remove(),
 });
 
 const container = div({ className: "container" }, [
