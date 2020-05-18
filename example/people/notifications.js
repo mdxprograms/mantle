@@ -1,4 +1,4 @@
-import { DOM } from "../src";
+import { DOM } from "../../src";
 import { personAdded, personRemoved } from "./events";
 
 const { div } = DOM;

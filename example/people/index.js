@@ -1,4 +1,4 @@
-import { DOM, mount, dispatch, m } from "../src";
+import { DOM, mount, dispatch, m } from "../../src";
 import { notify } from "./notifications";
 import { personAdded, personRemoved } from "./events";
 
