@@ -21,6 +21,7 @@ Principals:
 
 ## Examples
 
+`npm start`
 #### Adding and removing people from a list
 
 ```javascript
@@ -96,6 +97,7 @@ mount(document.getElementById("app"), App);
 
 #### Simple game
 
+`npm run start:game`
 ```javascript
 import { DOM, dispatch, mount } from "../../src";
 
