@@ -21,6 +21,40 @@ Principals:
 
 ## Examples
 
+#### Basic contact from
+```javascript
+import { DOM, dispatch } from "mantle";
+
+const { form, input, textarea, button } = DOM;
+
+const handleFormSubmit = ({ target }) => {
+  // do form things
+  const { name, message } = target.elements;
+  dispatch("form:submitted", { name: name.value, message: message.value })
+};
+
+const contactForm = form(
+  { className: "contact-form", onsubmit: handleFormSubmit },
+  [
+    input(
+      {
+        type: "text",
+        className: "name",
+        name: "name",
+        placeholder: "Your Name...",
+      },
+      ""
+    ),
+    textarea(
+      { className: "message", name: "message", placeholder: "Your Message..." }, ""
+    ),
+    button({ type: "submit", className: "btn" }, "Submit"),
+  ]
+);
+
+export default contactForm;
+```
+
 `npm start`
 #### Adding and removing people from a list
 
