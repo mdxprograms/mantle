@@ -23,13 +23,13 @@ personInput
 
 const addPersonBtn = button({ className: "btn" }, "Add person");
 addPersonBtn.on({
-  click: ({ target }) => dispatch(personAdded, target.value),
+  click: () => dispatch(personAdded, personInput.value),
 });
 
-const personLi = (_, val) => li({}, val);
-personLi.on({
-  click: ({ target }) => dispatch(personRemoved, target),
-});
+const personLi = (_, val) =>
+  li({}, val).on({
+    click: ({ target }) => dispatch(personRemoved, target),
+  });
 
 const personList = ul({ className: "person-list" }, []);
 personList.when({
