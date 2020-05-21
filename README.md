@@ -21,65 +21,16 @@ Principals:
 
 ## Examples
 
-#### Basic contact from
-```javascript
-import { DOM, dispatch } from "mantle";
-
-const { form, input, textarea, button } = DOM;
-
-const handleFormSubmit = ({ target }) => {
-  // do form things
-  const { name, message } = target.elements;
-  dispatch("form:submitted", { name: name.value, message: message.value })
-};
-
-const contactForm = form(
-  { className: "contact-form", onsubmit: handleFormSubmit },
-  [
-    input(
-      {
-        type: "text",
-        className: "name",
-        name: "name",
-        placeholder: "Your Name...",
-      },
-      ""
-    ),
-    textarea(
-      { className: "message", name: "message", placeholder: "Your Message..." }, ""
-    ),
-    button({ type: "submit", className: "btn" }, "Submit"),
-  ]
-);
-
-export default contactForm;
-```
-
 `npm start`
 #### Adding and removing people from a list
 
 ```javascript
-import { DOM, mount, dispatch, m } from "../../src";
+import { DOM, mount, dispatch } from "../../src";
 import { notify } from "./notifications";
 import { personAdded, personRemoved } from "./events";
 
 // Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
-
-/*
- * Plugins are objects with a name and an onValue function
- * Initial Plugin names should be capitalized to avoid destructuring issues
- */
-const TC = {
-  name: "titleCase",
-  onValue: (val) =>
-    val
-      .split(" ")
-      .map((w) => `${w[0].toUpperCase()}${w.substr(1).toLowerCase()}`)
-      .join(" "),
-};
-
-let { titleCase } = m.setPlugins([TC]);
 
 /*
  * /examples/events.js defines event names as key/val for easier access across other files
@@ -89,7 +40,7 @@ personInput
   .on({
     keydown: ({ key, target }) => {
       if (key === "Enter") {
-        dispatch(personAdded, titleCase(target.value));
+        dispatch(personAdded, target.value);
       }
     },
   })
@@ -99,13 +50,13 @@ personInput
 
 const addPersonBtn = button({ className: "btn" }, "Add person");
 addPersonBtn.on({
-  click: () => dispatch(personAdded, titleCase(personInput.value)),
+  click: () => dispatch(personAdded, personInput.value),
 });
 
-const personLi = (_, val) => li({}, val);
-personLi.on({
-  click: ({ target }) => dispatch(personRemoved, target),
-});
+const personLi = (_, val) =>
+  li({}, val).on({
+    click: ({ target }) => dispatch(personRemoved, target),
+  });
 
 const personList = ul({ className: "person-list" }, []);
 personList.when({
@@ -123,7 +74,6 @@ const container = div({ className: "container" }, [
 const App = main({ id: "app-root" }, container);
 
 mount(document.getElementById("app"), App);
-
 ```
 
 #### Simple infected card game
