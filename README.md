@@ -1,7 +1,7 @@
 Mantle
 --
 
-Principals:
+Goals:
 
 - Easy to write
 - Javascript only
