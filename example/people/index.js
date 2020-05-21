@@ -1,24 +1,9 @@
-import { DOM, mount, dispatch, m } from "../../src";
+import { DOM, mount, dispatch } from "../../src";
 import { notify } from "./notifications";
 import { personAdded, personRemoved } from "./events";
 
 // Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
-
-/*
- * Plugins are objects with a name and an onValue function
- * Initial Plugin names should be capitalized to avoid destructuring issues
- */
-const TC = {
-  name: "titleCase",
-  onValue: (val) =>
-    val
-      .split(" ")
-      .map((w) => `${w[0].toUpperCase()}${w.substr(1).toLowerCase()}`)
-      .join(" "),
-};
-
-let { titleCase } = m.setPlugins([TC]);
 
 /*
  * /examples/events.js defines event names as key/val for easier access across other files
@@ -28,7 +13,7 @@ personInput
   .on({
     keydown: ({ key, target }) => {
       if (key === "Enter") {
-        dispatch(personAdded, titleCase(target.value));
+        dispatch(personAdded, target.value);
       }
     },
   })
@@ -38,7 +23,7 @@ personInput
 
 const addPersonBtn = button({ className: "btn" }, "Add person");
 addPersonBtn.on({
-  click: () => dispatch(personAdded, titleCase(personInput.value)),
+  click: ({ target }) => dispatch(personAdded, target.value),
 });
 
 const personLi = (_, val) => li({}, val);
