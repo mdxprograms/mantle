@@ -9,12 +9,6 @@ elementTypes.map((type) => {
     let el = Object.assign(document.createElement(type.element), { ...props });
     let fragment = document.createDocumentFragment();
 
-    Object.keys(props)
-      .filter((key) => key.includes(":"))
-      .forEach((k) => {
-        on(k, el[`${k}`]);
-      });
-
     el.mId = !("mId" in props) ? uuidv4() : props.mId;
 
     if (Array.isArray(children)) {
@@ -27,6 +21,28 @@ elementTypes.map((type) => {
     }
 
     el.appendChild(fragment);
+
+    // apply native listeners
+    // on
+    el.on = (events = {}) => {
+      for (const key in events) {
+        if (Object.hasOwnProperty.call(events, key)) {
+          el.addEventListener(key, events[key]);
+        }
+      }
+      return el;
+    };
+
+    // apply custom event listeners
+    // when
+    el.when = (events = {}) => {
+      for (const key in events) {
+        if (Object.hasOwnProperty.call(events, key)) {
+          on(key, (data) => events[key](el, data));
+        }
+      }
+      return el;
+    };
 
     return el;
   };

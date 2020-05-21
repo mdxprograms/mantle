@@ -59,14 +59,17 @@ export default contactForm;
 #### Adding and removing people from a list
 
 ```javascript
-import { DOM, mount, dispatch, m } from "../src";
+import { DOM, mount, dispatch, m } from "../../src";
 import { notify } from "./notifications";
 import { personAdded, personRemoved } from "./events";
 
 // Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
 
-// Plugins either installed or local can be applied like the following
+/*
+ * Plugins are objects with a name and an onValue function
+ * Initial Plugin names should be capitalized to avoid destructuring issues
+ */
 const TC = {
   name: "titleCase",
   onValue: (val) =>
@@ -76,45 +79,38 @@ const TC = {
       .join(" "),
 };
 
-const ToURL = {
-  name: "toUrl",
-  onValue: (val) => val.split(" ").join("-"),
-};
+let { titleCase } = m.setPlugins([TC]);
 
 /*
- * Plugins are objects with a name and an onValue function
- * Initial Plugin names should be capitalized to avoid destructuring issues
+ * /examples/events.js defines event names as key/val for easier access across other files
  */
-let { titleCase } = m.setPlugins([TC, ToURL]);
+const personInput = input({ type: "text", className: "person-input" }, "");
+personInput
+  .on({
+    keydown: ({ key, target }) => {
+      if (key === "Enter") {
+        dispatch(personAdded, titleCase(target.value));
+      }
+    },
+  })
+  .when({
+    [personAdded]: (self, _) => (self.value = ""),
+  });
 
-/*
- * Functions defined with : are automatically mapped to dispatch and
- * receive the dispatched value.
- * /examples/events.js defines event names for easier access across other files
- */
-const personInput = input({
-  [personAdded]: () => (personInput.value = ""),
-  onkeydown: ({ key, target }) => {
-    if (key === "Enter") {
-      dispatch(personAdded, titleCase(target.value));
-    }
-  },
+const addPersonBtn = button({ className: "btn" }, "Add person");
+addPersonBtn.on({
+  click: () => dispatch(personAdded, titleCase(personInput.value)),
 });
 
-// Use dispatch to send an event
-const addPersonBtn = button(
-  {
-    onclick: () => dispatch(personAdded, titleCase(personInput.value)),
-  },
-  "Add person"
-);
+const personLi = (_, val) => li({}, val);
+personLi.on({
+  click: ({ target }) => dispatch(personRemoved, target),
+});
 
-const personList = ul({
-  [personAdded]: (val) =>
-    personList.appendChild(
-      li({ onclick: ({ target }) => dispatch(personRemoved, target) }, val)
-    ),
-  [personRemoved]: (child) => child.remove(),
+const personList = ul({ className: "person-list" }, []);
+personList.when({
+  [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
+  [personRemoved]: (_, child) => child.remove(),
 });
 
 const container = div({ className: "container" }, [
@@ -127,6 +123,7 @@ const container = div({ className: "container" }, [
 const App = main({ id: "app-root" }, container);
 
 mount(document.getElementById("app"), App);
+
 ```
 
 #### Simple game
