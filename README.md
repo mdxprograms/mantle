@@ -1,7 +1,7 @@
 Mantle
 --
 
-Principals:
+Goals:
 
 - Easy to write
 - Javascript only
@@ -21,100 +21,47 @@ Principals:
 
 ## Examples
 
-#### Basic contact from
-```javascript
-import { DOM, dispatch } from "mantle";
-
-const { form, input, textarea, button } = DOM;
-
-const handleFormSubmit = ({ target }) => {
-  // do form things
-  const { name, message } = target.elements;
-  dispatch("form:submitted", { name: name.value, message: message.value })
-};
-
-const contactForm = form(
-  { className: "contact-form", onsubmit: handleFormSubmit },
-  [
-    input(
-      {
-        type: "text",
-        className: "name",
-        name: "name",
-        placeholder: "Your Name...",
-      },
-      ""
-    ),
-    textarea(
-      { className: "message", name: "message", placeholder: "Your Message..." }, ""
-    ),
-    button({ type: "submit", className: "btn" }, "Submit"),
-  ]
-);
-
-export default contactForm;
-```
-
 `npm start`
 #### Adding and removing people from a list
 
 ```javascript
-import { DOM, mount, dispatch, m } from "../src";
+import { DOM, mount, dispatch } from "../../src";
 import { notify } from "./notifications";
 import { personAdded, personRemoved } from "./events";
 
 // Pull the needed DOM elements
 const { main, div, input, button, ul, li } = DOM;
 
-// Plugins either installed or local can be applied like the following
-const TC = {
-  name: "titleCase",
-  onValue: (val) =>
-    val
-      .split(" ")
-      .map((w) => `${w[0].toUpperCase()}${w.substr(1).toLowerCase()}`)
-      .join(" "),
-};
-
-const ToURL = {
-  name: "toUrl",
-  onValue: (val) => val.split(" ").join("-"),
-};
-
 /*
- * Plugins are objects with a name and an onValue function
- * Initial Plugin names should be capitalized to avoid destructuring issues
+ * /examples/events.js defines event names as key/val for easier access across other files
  */
-let { titleCase } = m.setPlugins([TC, ToURL]);
+const personInput = input({ type: "text", className: "person-input" }, "");
+personInput
+  .on({
+    keydown: ({ key, target }) => {
+      if (key === "Enter") {
+        dispatch(personAdded, target.value);
+      }
+    },
+  })
+  .when({
+    [personAdded]: (self, _) => (self.value = ""),
+  });
 
-/*
- * Functions defined with : are automatically mapped to dispatch and
- * receive the dispatched value.
- * /examples/events.js defines event names for easier access across other files
- */
-const personInput = input({
-  [personAdded]: () => (personInput.value = ""),
-  onkeydown: ({ key, target }) => {
-    if (key === "Enter") {
-      dispatch(personAdded, titleCase(target.value));
-    }
-  },
+const addPersonBtn = button({ className: "btn" }, "Add person");
+addPersonBtn.on({
+  click: () => dispatch(personAdded, personInput.value),
 });
 
-// Use dispatch to send an event
-const addPersonBtn = button(
-  {
-    onclick: () => dispatch(personAdded, titleCase(personInput.value)),
-  },
-  "Add person"
-);
+const personLi = (_, val) =>
+  li({}, val).on({
+    click: ({ target }) => dispatch(personRemoved, target),
+  });
 
-const personList = ul({
-  [personAdded]: (val) =>
-    personList.appendChild(
-      li({ onclick: ({ target }) => dispatch(personRemoved, target) }, val)
-    ),
-  [personRemoved]: (child) => child.remove(),
+const personList = ul({ className: "person-list" }, []);
+personList.when({
+  [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
+  [personRemoved]: (_, child) => child.remove(),
 });
 
 const container = div({ className: "container" }, [
@@ -129,121 +76,95 @@ const App = main({ id: "app-root" }, container);
 mount(document.getElementById("app"), App);
 ```
 
-#### Simple game
+#### Simple infected card game
 
 `npm run start:game`
 ```javascript
 import { DOM, dispatch, mount } from "../../src";
+import {
+  disableSquareClicks,
+  getInfectedIndex,
+  isInfected,
+  restartGame,
+  setSquareBg,
+  toggleInfected,
+} from "./helpers";
 
 const { div, button, h5, style } = DOM;
 
 import healthyImg from "./healthy.png";
 import infectedImg from "./infected.png";
 
-// functions and actions
-const getInfectedIndex = () => Math.floor(Math.random() * 16);
-
-const genSquares = () =>
-  Array(16)
-    .fill(null)
-    .map((_, index) => new GameSquare(index + 1));
-
-const getAllSquares = () => [...document.querySelectorAll(".game-square")];
-
-const disableSquareClicks = () =>
-  getAllSquares().forEach((square) => (square.style.pointerEvents = "none"));
-
-const isInfected = (target) => target.classList.contains("infected");
-
-const restartGame = () => {
-  dispatch("game:restart", { infectedIndex: getInfectedIndex() });
-};
-
 // components
-function GameSquare(index) {
-  this.index = index;
+const gameSquare = (index) =>
+  div({ className: "game-square", index }, "")
+    .on({
+      click: ({ target }) => {
+        if (isInfected(target)) {
+          setSquareBg(target, infectedImg);
+          disableSquareClicks();
+          dispatch("patient:infected");
 
-  this.checkInfection = (infectedIndex) =>
-    this.element.classList.toggle("infected", this.index === infectedIndex);
-
-  this.setSquareBg = (status) =>
-    (this.element.style.background = `url(${
-      status === "healthy" ? healthyImg : infectedImg
-    }) center / contain no-repeat`);
-
-  this.element = div({
-    className: "game-square",
-    "game:start": ({ infectedIndex }) => this.checkInfection(infectedIndex),
-    "game:restart": ({ infectedIndex }) => {
-      this.element.style = {};
-      this.checkInfection(infectedIndex);
-    },
-    onclick: ({ target }) => {
-      if (isInfected(target)) {
-        this.setSquareBg("infected");
-        disableSquareClicks();
-        dispatch("patient:infected");
-
-        setTimeout(() => restartGame(), 1500);
-      } else {
-        this.setSquareBg("healthy");
-        dispatch("patient:saved");
-      }
-    },
-  });
-
-  return this.element;
-}
-
-function SavedCount() {
-  this.saved = 0;
-
-  this.element = h5(
-    {
-      className: "saved-count",
-      "patient:saved": () => {
-        this.element.textContent = `Patients Saved: ${++this.saved}`;
+          setTimeout(() => restartGame(), 1500);
+        } else {
+          setSquareBg(target, healthyImg);
+          dispatch("patient:saved");
+        }
       },
-    },
-    "Patients Saved: 0"
-  );
-
-  return this.element;
-}
-
-function InfectedCount() {
-  this.infected = 0;
-
-  this.element = h5(
-    {
-      className: "infected-count",
-      "patient:infected": () => {
-        this.element.textContent = `Patients Infected: ${++this.infected}`;
+    })
+    .when({
+      "game:start": (self, { infectedIndex }) =>
+        toggleInfected(self, infectedIndex),
+      "game:restart": (self, { infectedIndex }) => {
+        self.style = {};
+        toggleInfected(self, infectedIndex);
       },
-    },
-    "Patients Infected: 0"
-  );
+    });
 
-  return this.element;
-}
+const savedCount = h5(
+  { className: "saved-count", saved: 0 },
+  "Patients Saved: 0"
+);
+savedCount.when({
+  "patient:saved": (self, _) =>
+    (self.textContent = `Patients Saved: ${++self.saved}`),
+});
+
+const infectedCount = h5(
+  { className: "infected-count", infected: 0 },
+  "Patients Infected: 0"
+);
+infectedCount.when({
+  "patient:infected": (self, _) => {
+    self.textContent = `Patients Infected: ${++self.infected}`;
+  },
+});
 
 const restartBtn = button(
   {
     className: "f6 link dim ph3 pv2 mb2 b dib white bg-black",
-    onclick() {
-      restartGame();
-      restartBtn.textContent = "Restarting...";
-
-      setTimeout(() => {
-        restartBtn.textContent = "Restart";
-      }, 1500);
-    },
   },
   "Restart"
 );
+restartBtn.on({
+  click({ target }) {
+    restartGame();
+    target.textContent = "Restarting...";
+
+    setTimeout(() => {
+      target.textContent = "Restart";
+    }, 1500);
+  },
+});
+
+const genSquares = () =>
+  Array(16)
+    .fill(null)
+    .map((_, index) => gameSquare(index + 1));
 
 const gameBoard = div({ className: "game-board" }, [...genSquares()]);
 
+// styles.js
 const makeStyle = style(
   {},
   `
@@ -266,14 +187,10 @@ const makeStyle = style(
 );
 
 // initialize game app
-document.addEventListener("DOMContentLoaded", () => {
-  document.head.appendChild(makeStyle);
+document.head.appendChild(makeStyle);
 
-  const savedCount = new SavedCount();
-  const infectedCount = new InfectedCount();
-  const game = div({}, [restartBtn, savedCount, infectedCount, gameBoard]);
-  mount(document.getElementById("app"), game);
-  dispatch("game:start", { infectedIndex: getInfectedIndex() });
-});
+const game = div({}, [restartBtn, savedCount, infectedCount, gameBoard]);
 
+mount(document.getElementById("app"), game);
+dispatch("game:start", { infectedIndex: getInfectedIndex() });
 ```
