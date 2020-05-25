@@ -28,7 +28,7 @@ describe("Add person", () => {
 
 describe("Remove person", () => {
   it("Should remove person from list", () => {
-    cy.get("ul li")
+    cy.get("ul li button")
       .first()
       .click()
       .then(() => {
