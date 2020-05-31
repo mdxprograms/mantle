@@ -4,9 +4,9 @@ import { on } from "./emitter";
 
 let DOM = {};
 
-elementTypes.map((type) => {
-  DOM[type.element] = (props = {}, children) => {
-    let el = Object.assign(document.createElement(type.element), { ...props });
+elementTypes.map((element) => {
+  DOM[element] = (props = {}, children) => {
+    let el = Object.assign(document.createElement(element), { ...props });
     let fragment = document.createDocumentFragment();
 
     el.mId = !("mId" in props) ? uuidv4() : props.mId;
