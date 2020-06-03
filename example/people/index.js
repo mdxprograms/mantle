@@ -8,8 +8,10 @@ const { main, div, input, button, ul, li, span } = DOM;
 /*
  * /examples/events.js defines event names as key/val for easier access across other files
  */
-const personInput = input({ type: "text", className: "pa2 ba b--light-gray mr2" }, "");
-personInput
+const personInput = input(
+  { type: "text", className: "pa2 ba b--light-gray mr2" },
+  ""
+)
   .on({
     keydown: ({ key, target }) => {
       if (key === "Enter") {
@@ -19,11 +21,13 @@ personInput
   })
   .when({
     [personAdded]: (self, _) => (self.value = ""),
-    [personRemoved]: (self, _) => self.focus()
+    [personRemoved]: (self, _) => self.focus(),
   });
 
-const addPersonBtn = button({ className: "pa2 bg-red white bn" }, "Add person");
-addPersonBtn.on({
+const addPersonBtn = button(
+  { className: "pa2 bg-red white bn" },
+  "Add person"
+).on({
   click: () => dispatch(personAdded, personInput.value),
 });
 
@@ -35,8 +39,7 @@ const personLi = (_, val) =>
     }),
   ]);
 
-const personList = ul({ className: "list pl0 mt4" }, []);
-personList.when({
+const personList = ul({ className: "list pl0 mt4" }, []).when({
   [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
   [personRemoved]: (_, child) => child.remove(),
 });

@@ -42,8 +42,7 @@ const gameSquare = (index) =>
 const savedCount = h5(
   { className: "saved-count", saved: 0 },
   "Patients Saved: 0"
-);
-savedCount.when({
+).when({
   "patient:saved": (self, _) =>
     (self.textContent = `Patients Saved: ${++self.saved}`),
 });
@@ -51,8 +50,7 @@ savedCount.when({
 const infectedCount = h5(
   { className: "infected-count", infected: 0 },
   "Patients Infected: 0"
-);
-infectedCount.when({
+).when({
   "patient:infected": (self, _) => {
     self.textContent = `Patients Infected: ${++self.infected}`;
   },
@@ -63,8 +61,7 @@ const restartBtn = button(
     className: "f6 link dim ph3 pv2 mb2 b dib white bg-black",
   },
   "Restart"
-);
-restartBtn.on({
+).on({
   click({ target }) {
     restartGame();
     target.textContent = "Restarting...";
