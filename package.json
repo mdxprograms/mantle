@@ -9,7 +9,7 @@
     "start": "parcel watch src/index.js",
     "start:people": "parcel examples/people/index.html -p 3000 --out-dir examples/dist --open",
     "start:game": "parcel examples/simple-game/index.html -p 3000 --out-dir examples/dist --open",
-    "build": "rm -rf dist && parcel build src/index.js --global mantle",
+    "build": "rm -rf dist && parcel build src/index.js --global @wallerbuilt/mantle",
     "fix:scripts": "eslint --fix src/",
     "cypress": "cypress open"
   },
