@@ -35,8 +35,7 @@ const { main, div, input, button, ul, li } = DOM;
 /*
  * /examples/events.js defines event names as key/val for easier access across other files
  */
-const personInput = input({ type: "text", className: "person-input" }, "");
-personInput
+const personInput = input({ type: "text", className: "person-input" }, "")
   .on({
     keydown: ({ key, target }) => {
       if (key === "Enter") {
@@ -48,21 +47,21 @@ personInput
     [personAdded]: (self, _) => (self.value = ""),
   });
 
-const addPersonBtn = button({ className: "btn" }, "Add person");
-addPersonBtn.on({
-  click: () => dispatch(personAdded, personInput.value),
-});
+const addPersonBtn = button({ className: "btn" }, "Add person")
+  .on({
+    click: () => dispatch(personAdded, personInput.value),
+  });
 
-const personLi = (_, val) =>
-  li({}, val).on({
+const personLi = (_, val) => li({}, val)
+  .on({
     click: ({ target }) => dispatch(personRemoved, target),
   });
 
-const personList = ul({ className: "person-list" }, []);
-personList.when({
-  [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
-  [personRemoved]: (_, child) => child.remove(),
-});
+const personList = ul({ className: "person-list" }, [])
+  .when({
+    [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
+    [personRemoved]: (_, child) => child.remove(),
+  });
 
 const container = div({ className: "container" }, [
   notify,
@@ -124,8 +123,7 @@ const gameSquare = (index) =>
 const savedCount = h5(
   { className: "saved-count", saved: 0 },
   "Patients Saved: 0"
-);
-savedCount.when({
+).when({
   "patient:saved": (self, _) =>
     (self.textContent = `Patients Saved: ${++self.saved}`),
 });
@@ -133,8 +131,7 @@ savedCount.when({
 const infectedCount = h5(
   { className: "infected-count", infected: 0 },
   "Patients Infected: 0"
-);
-infectedCount.when({
+).when({
   "patient:infected": (self, _) => {
     self.textContent = `Patients Infected: ${++self.infected}`;
   },
@@ -145,8 +142,7 @@ const restartBtn = button(
     className: "f6 link dim ph3 pv2 mb2 b dib white bg-black",
   },
   "Restart"
-);
-restartBtn.on({
+).on({
   click({ target }) {
     restartGame();
     target.textContent = "Restarting...";
@@ -183,7 +179,7 @@ const makeStyle = style(
     height: 100%;
     width: 100%;
   }
-`
+  `
 );
 
 // initialize game app
