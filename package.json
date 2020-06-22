@@ -1,31 +1,42 @@
 {
-  "name": "mantle",
+  "name": "@wallerbuilt/mantle",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "An event driven Javascript library",
+  "main": "dist/index.js",
   "repository": "https://github.com/mdxprograms/mantle",
+  "private": false,
   "scripts": {
-    "start": "parcel example/people/index.html -p 3000",
-    "start:game": "parcel example/simple-game/index.html -p 3000",
-    "build": "rm -rf dist && parcel build src/index.js",
+    "start": "parcel watch src/index.js",
+    "start:people": "parcel examples/people/index.html -p 3000 --out-dir examples/dist --open",
+    "start:game": "parcel examples/simple-game/index.html -p 3000 --out-dir examples/dist --open",
+    "build": "rm -rf dist && parcel build src/index.js --global mantle",
     "fix:scripts": "eslint --fix src/",
-    "test": "cypress open"
+    "cypress": "cypress open"
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run fix:scripts"
     }
   },
-  "keywords": [],
+  "keywords": [
+    "javascript",
+    "javascript-library",
+    "event-driven"
+  ],
   "author": "Josh Waller <mdx.programs@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.10.3",
+    "@babel/core": "^7.10.3",
+    "@babel/plugin-transform-runtime": "^7.10.3",
     "cypress": "^4.5.0",
     "eslint": "^7.0.0",
+    "gh-pages": "^3.1.0",
     "husky": "^4.2.5",
     "parcel-bundler": "^1.12.4"
   },
   "dependencies": {
+    "@babel/runtime": "^7.10.3",
     "nanobus": "^4.4.0"
   }
 }

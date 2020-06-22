@@ -1,0 +1,9 @@
+{
+  "presets": [
+    ["@babel/preset-env", { "useBuiltIns": "usage" }]
+  ],
+  "plugins": [
+    "@babel/syntax-object-rest-spread",
+    "@babel/transform-runtime"
+  ]
+}
