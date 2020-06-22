@@ -26,7 +26,7 @@ elementTypes.map((element) => {
     // on
     el.on = (events = {}) => {
       for (const key in events) {
-        if (Object.hasOwnProperty.call(events, key)) {
+        if (key in events) {
           el.addEventListener(key, events[key]);
         }
       }
@@ -37,7 +37,7 @@ elementTypes.map((element) => {
     // when
     el.when = (events = {}) => {
       for (const key in events) {
-        if (Object.hasOwnProperty.call(events, key)) {
+        if (key in events) {
           on(key, (data) => events[key](el, data));
         }
       }
