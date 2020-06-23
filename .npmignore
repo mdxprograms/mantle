@@ -5,3 +5,6 @@ tests
 ava.config.js
 .nyc_output
 coverage
+.cache
+.github
+.vscode
