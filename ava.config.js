@@ -1,3 +1,7 @@
 export default {
-  files: ["tests/**/*"],
-};
+  files: ['tests/**/*'],
+  require: [
+    'esm',
+    './tests/_setup-browser-env.js'
+  ]
+}
