@@ -1,11 +1,22 @@
 # Mantle
 
+[![npm version](https://badge.fury.io/js/%40wallerbuilt%2Fmantle.svg)](https://badge.fury.io/js/%40wallerbuilt%2Fmantle)
+
 Goals:
 
 - Easy to write
 - Javascript only
 - Minimal markup
 - Event system over state machine
+
+## Install
+```bash
+npm i -S @wallerbuilt/mantle
+```
+
+```javascript
+import { DOM, mount, dispatch } from '@wallerbuilt/mantle'
+```
 
 ## Examples
 
@@ -99,8 +110,18 @@ Mantle comes with three main concepts:
 - `npm i`
 - `npm start`
 
-## e2e tests for examples
+### e2e tests for examples
 - `npm run cypress` (will start cypress)
 
-## Build
+### Unit tests
+
+All tests reside in the `tests` directory
+
+To run a watch on tests:
+`npm run test:watch`
+
+To run tests once:
+`npm run test`
+
+### Build
 - `npm run build`
