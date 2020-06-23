@@ -99,8 +99,8 @@ Mantle comes with three main concepts:
 - `npm i`
 - `npm start`
 
-## UI tests
-- `npm run test` (will start cypress)
+## e2e tests for examples
+- `npm run cypress` (will start cypress)
 
 ## Build
 - `npm run build`

@@ -1,4 +1,4 @@
 export const { personAdded, personRemoved } = {
-  personAdded: "person:added",
-  personRemoved: "person:removed"
-};
+  personAdded: 'person:added',
+  personRemoved: 'person:removed'
+}
