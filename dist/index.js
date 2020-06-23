@@ -31,4 +31,3 @@ var e=require("remove-array-items"),t=require("nanotiming"),s=require("assert");
 },{"@babel/runtime/helpers/typeof":"b9XL","@babel/runtime/helpers/defineProperty":"IxO8","uuid":"qQO4","./elements.json":"FAj7","./emitter":"H0u9"}],"Focm":[function(require,module,exports) {
 "use strict";Object.defineProperty(exports,"__esModule",{value:!0}),Object.defineProperty(exports,"DOM",{enumerable:!0,get:function(){return e.default}}),Object.defineProperty(exports,"dispatch",{enumerable:!0,get:function(){return t.dispatch}}),Object.defineProperty(exports,"on",{enumerable:!0,get:function(){return t.on}}),exports.mount=void 0;var e=r(require("./dom")),t=require("./emitter");function r(e){return e&&e.__esModule?e:{default:e}}var n=function(e,t){e.appendChild(t)};exports.mount=n;
 },{"./dom":"fRxd","./emitter":"H0u9"}]},{},["Focm"], "@wallerbuilt/mantle")
-//# sourceMappingURL=/index.js.map
