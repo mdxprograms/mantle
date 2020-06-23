@@ -1,3 +1,5 @@
 examples
 cypress
 cypress.json
+tests
+ava.config.js

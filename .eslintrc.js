@@ -1,21 +1,24 @@
+/* eslint-disable no-undef */
 module.exports = {
   env: {
     browser: true,
-    es6: true,
+    es6: true
   },
-  extends: "eslint:recommended",
+  extends: 'eslint:recommended',
   globals: {
-    Atomics: "readonly",
-    SharedArrayBuffer: "readonly",
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly'
   },
   parserOptions: {
     ecmaVersion: 11,
-    sourceType: "module",
+    sourceType: 'module'
   },
   rules: {
-    indent: ["error", 2],
-    "linebreak-style": ["error", "unix"],
-    quotes: ["error", "double"],
-    semi: ["error", "always"],
-  },
-};
+    indent: ['error', 2],
+    'linebreak-style': ['error', 'unix'],
+    quotes: ['error', 'single'],
+    semi: ['error', 'never'],
+    'comma-dangle': ['error', 'never'],
+    'arrow-parens': ['error', 'as-needed']
+  }
+}
