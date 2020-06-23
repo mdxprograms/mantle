@@ -4,3 +4,4 @@ cypress.json
 tests
 ava.config.js
 .nyc_output
+coverage

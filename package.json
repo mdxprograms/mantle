@@ -14,7 +14,7 @@
     "cypress": "cypress open",
     "test": "ava --verbose",
     "test:watch": "ava --verbose --watch",
-    "coverage": "nyc ava --verbose"
+    "coverage": "nyc -r html -n src/**/*.js npm run test"
   },
   "husky": {
     "hooks": {
