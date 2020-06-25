@@ -8,3 +8,4 @@ coverage
 .cache
 .github
 .vscode
+src
