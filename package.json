@@ -1,7 +1,7 @@
 {
   "name": "@wallerbuilt/mantle",
-  "version": "1.0.4",
-  "description": "An event driven Javascript library",
+  "version": "1.0.5",
+  "description": "An event-driven Javascript library",
   "main": "dist/index.js",
   "repository": "https://github.com/mdxprograms/mantle",
   "private": false,
@@ -24,7 +24,9 @@
   "keywords": [
     "javascript",
     "javascript-library",
-    "event-driven"
+    "event-driven",
+    "dom",
+    "minimal"
   ],
   "author": "Josh Waller <mdx.programs@gmail.com>",
   "license": "MIT",
