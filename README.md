@@ -20,7 +20,9 @@ import { DOM, mount, dispatch } from '@wallerbuilt/mantle'
 
 ## Examples
 
-Take a look at the [examples](https://github.com/mdxprograms/mantle/tree/master/examples) for implementation ideas.
+Demo card game
+  - repo: https://github.com/wallerbuilt/mantle-card-game
+  - preview: https://mantle-card-game.netlify.app/
 
 ## Documentation
 
