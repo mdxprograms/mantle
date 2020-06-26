@@ -11,6 +11,5 @@ export const setStyle = styles => el => {
   styles.forEach(([k, v]) => {
     el.style[k] = v
   })
-
   return el
 }
