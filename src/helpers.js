@@ -36,7 +36,7 @@ export const setProp = (k, v) => el => {
  * @param {HTMLElement} el
  * @return {any}
  */
-export const getProp = k => el => el.getAttribute(k)
+export const getProp = k => el => el.hasAttribute(k) && el.getAttribute(k)
 
 /**
  * @name setStyle
