@@ -6,16 +6,16 @@ import { personAdded, personRemoved } from './events'
 const { main, div, input, button, ul, li, span } = DOM
 
 /*
- * /examples/events.js defines event names as key/val for easier access across other files
+ * /examples/people/events.js defines event names as key/val for easier access across other files
  */
-const personInput = input(
+const PersonInput = input(
   { type: 'text', className: 'pa2 ba b--light-gray mr2' },
   ''
 )
   .on({
-    keydown: ({ key, target }) => {
+    keydown({ key }) {
       if (key === 'Enter') {
-        dispatch(personAdded, target.value)
+        dispatch(personAdded, this.value)
       }
     }
   })
@@ -24,33 +24,36 @@ const personInput = input(
     [personRemoved]: self => self.focus()
   })
 
-const addPersonBtn = button(
+const AddPersonButton = button(
   { className: 'pa2 bg-red white bn' },
   'Add person'
 ).on({
-  click: () => dispatch(personAdded, personInput.value)
+  click: () => dispatch(personAdded, PersonInput.value)
 })
 
-const personLi = (_, val) =>
+const PersonListItem = val =>
   li({}, [
     span({ className: 'mr2 f3'}, val),
     button({ className: 'pa1 bg-black white bn' }, 'Delete?').on({
-      click: e => dispatch(personRemoved, e.currentTarget.parentElement)
+      click() {
+        dispatch(personRemoved, this.parentNode)
+      }
     })
   ])
 
-const personList = ul({ className: 'list pl0 mt4' }, []).when({
-  [personAdded]: (self, val) => self.appendChild(personLi(self, val)),
-  [personRemoved]: (_, child) => child.remove()
+const PersonList = ul({ className: 'list pl0 mt4' }, []).when({
+  [personAdded]: (self, val) => self.appendChild(PersonListItem(val)),
+  [personRemoved]: (self, child) => child.remove()
 })
 
-const container = div({ className: 'container tc' }, [
-  notify,
-  personInput,
-  addPersonBtn,
-  personList
-])
-
-const App = main({ id: 'app-root' }, container)
+const App = main(
+  { id: 'app-root' },
+  div({ className: 'container tc' }, [
+    notify,
+    PersonInput,
+    AddPersonButton,
+    PersonList
+  ])
+)
 
 mount(document.getElementById('app'), App)
