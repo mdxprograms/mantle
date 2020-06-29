@@ -52,7 +52,21 @@ export const getProp = k => el => el.hasAttribute(k) && el.getAttribute(k)
  */
 export const setStyle = styles => el => {
   styles.forEach(([k, v]) => {
-    el.style[k] = v
+    el.style.setProperty(k, v)
   })
   return el
+}
+
+/**
+ * @name append
+ * @description Appends node to parent target
+ * @example
+ * append(li({}, 'child'))(ul({}, []))
+ * @param  {HTMLElement} node
+ * @param {HTMLElement} target
+ * @return {HTMLElement}
+ */
+export const append = node => target => {
+  target.appendChild(node)
+  return target
 }

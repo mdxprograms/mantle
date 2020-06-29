@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 import test from 'ava'
-import { DOM, setProp, setStyle, getProp, compose } from '../src'
+import { DOM, setProp, setStyle, getProp, compose, append } from '../src'
 
-const { button } = DOM
+const { button, ul, li } = DOM
 
 test.beforeEach(t => {
   t.context = {
@@ -33,4 +33,11 @@ test('Should compose button data-title and add border', t => {
 
   t.is(t.context.btn.dataset.title, 'Test Button')
   t.is(t.context.btn.style.border, '1px solid red')
+})
+
+test('Should append child to parent node', t => {
+  const list = ul({}, [])
+  const listItem = li({}, 'Child')
+  append(listItem)(list)
+  t.is(list.children[0].textContent, 'Child')
 })
