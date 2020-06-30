@@ -97,10 +97,14 @@ test('Should return child element when queried', t => {
 })
 
 test('Should return nodeList of elements when queried', t => {
-  const list = ul({}, [
-    li({ className: 'first-child' }, 'First Child'),
-    li({ className: 'second-child' }, 'Second Child')
-  ])
-  t.is(getText(qsAll('li')(list)[0]), 'First Child')
-  t.is(getText(qsAll('li')(list)[1]), 'Second Child')
+  const matches = ['First Child', 'Second Child']
+  const list = ul({}, matches.map(txt => li({}, txt)))
+
+  const map = fn => arr => arr.map(fn)
+
+  const liText = compose(map(getText), qsAll('li'))(list)
+
+  liText.forEach((lit, i) => {
+    t.is(lit, matches[i])
+  })
 })
