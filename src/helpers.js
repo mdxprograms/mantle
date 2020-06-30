@@ -62,11 +62,41 @@ export const setStyle = styles => el => {
  * @description Appends node to parent target
  * @example
  * append(li({}, 'child'))(ul({}, []))
- * @param  {HTMLElement} node
+ * @param  {HTMLElement} element
  * @param {HTMLElement} target
  * @return {HTMLElement}
  */
-export const append = node => target => {
-  target.appendChild(node)
+export const append = element => target => {
+  target.appendChild(element)
+  return target
+}
+
+/**
+ * @name remove
+ * @description Removes a child element
+ * @example
+ * remove(li({}))(ul({}))
+ * @param {HTMLElement} element
+ * @param {HTMLElement} target
+ * @return {HTMLElement}
+ *
+ */
+export const remove = element => target => {
+  target.removeChild(element)
+  return target
+}
+
+/**
+ * @name clear
+ * @param {HTMLElement} target
+ * @description Removes all child elements
+ * @example
+ * clear(target)
+ * @return target
+ */
+export const clear = target => {
+  while (target.children.length > 0) {
+    target.firstElementChild.remove()
+  }
   return target
 }
