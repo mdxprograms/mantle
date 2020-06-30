@@ -1,57 +1,30 @@
-import { DOM, mount, dispatch } from '../../src'
+import { DOM, mount, dispatch, append, remove } from '../../src'
 import { notify } from './notifications'
-import { personAdded, personRemoved } from './events'
+import NewPersonForm from './NewPersonForm'
 
 // Pull the needed DOM elements
-const { main, div, input, button, ul, li, span } = DOM
-
-/*
- * /examples/people/events.js defines event names as key/val for easier access across other files
- */
-const PersonInput = input(
-  { type: 'text', className: 'pa2 ba b--light-gray mr2' },
-  ''
-)
-  .on({
-    keydown({ key }) {
-      if (key === 'Enter') {
-        dispatch(personAdded, this.value)
-      }
-    }
-  })
-  .when({
-    [personAdded]: self => self.value = '',
-    [personRemoved]: self => self.focus()
-  })
-
-const AddPersonButton = button(
-  { className: 'pa2 bg-red white bn' },
-  'Add person'
-).on({
-  click: () => dispatch(personAdded, PersonInput.value)
-})
+const { main, div, button, ul, li, span } = DOM
 
 const PersonListItem = val =>
   li({}, [
     span({ className: 'mr2 f3'}, val),
     button({ className: 'pa1 bg-black white bn' }, 'Delete?').on({
       click() {
-        dispatch(personRemoved, this.parentNode)
+        dispatch('person:removed', this.parentNode)
       }
     })
   ])
 
 const PersonList = ul({ className: 'list pl0 mt4' }, []).when({
-  [personAdded]: (self, val) => self.appendChild(PersonListItem(val)),
-  [personRemoved]: (self, child) => child.remove()
+  ['person:added']: (self, val) => append(PersonListItem(val))(self),
+  ['person:removed']: (self, child) => remove(child)(self)
 })
 
 const App = main(
   { id: 'app-root' },
   div({ className: 'container tc' }, [
     notify,
-    PersonInput,
-    AddPersonButton,
+    NewPersonForm,
     PersonList
   ])
 )

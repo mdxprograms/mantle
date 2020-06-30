@@ -7,7 +7,11 @@ import {
   compose,
   append,
   remove,
-  clear
+  clear,
+  setText,
+  getText,
+  qs,
+  qsAll
 } from './helpers'
 
 const mount = (el, container) => {
@@ -24,5 +28,9 @@ export {
   compose,
   append,
   remove,
-  clear
+  clear,
+  setText,
+  getText,
+  qs,
+  qsAll
 }

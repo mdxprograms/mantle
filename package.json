@@ -18,7 +18,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run fix:scripts"
+      "pre-commit": "npm run fix:scripts && npm run build"
     }
   },
   "keywords": [

@@ -8,7 +8,11 @@ import {
   compose,
   append,
   remove,
-  clear
+  clear,
+  setText,
+  getText,
+  qs,
+  qsAll
 } from '../src'
 
 const { button, ul, li } = DOM
@@ -69,4 +73,34 @@ test('Should remove all children', t => {
   t.is(list.children.length, 7)
   clear(list)
   t.is(list.children.length, 0)
+})
+
+test('Should set text of element', t => {
+  const btn = button({}, 'Hello')
+  t.is(btn.textContent, 'Hello')
+  setText('Changed Button')(btn)
+  t.is(btn.textContent, 'Changed Button')
+})
+
+test('Should get text of element', t => {
+  const btn = button({}, 'Hello')
+  t.is(getText(btn), 'Hello')
+})
+
+test('Should return child element when queried', t => {
+  const list = ul({}, [
+    li({ className: 'first-child' }, 'First Child'),
+    li({ className: 'second-child' }, 'Second Child')
+  ])
+  const firstChild = qs('.first-child')(list)
+  t.is(getText(firstChild), 'First Child')
+})
+
+test('Should return nodeList of elements when queried', t => {
+  const list = ul({}, [
+    li({ className: 'first-child' }, 'First Child'),
+    li({ className: 'second-child' }, 'Second Child')
+  ])
+  t.is(getText(qsAll('li')(list)[0]), 'First Child')
+  t.is(getText(qsAll('li')(list)[1]), 'Second Child')
 })
