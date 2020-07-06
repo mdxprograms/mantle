@@ -1,4 +1,4 @@
-import { DOM, mount, dispatch, append, remove } from '../../src'
+import { DOM, mount, dispatch, append, remove, debug } from '../../src'
 import { notify } from './notifications'
 import NewPersonForm from './NewPersonForm'
 
@@ -15,10 +15,12 @@ const PersonListItem = val =>
     })
   ])
 
+
 const PersonList = ul({ className: 'list pl0 mt4' }, []).when({
   ['person:added']: (self, val) => append(PersonListItem(val))(self),
   ['person:removed']: (self, child) => remove(child)(self)
 })
+debug()
 
 const App = main(
   { id: 'app-root' },

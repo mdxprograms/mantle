@@ -13,6 +13,7 @@ import {
   qs,
   qsAll
 } from './helpers'
+import debug from './debug'
 
 const mount = (el, container) => {
   el.appendChild(container)
@@ -32,5 +33,6 @@ export {
   setText,
   getText,
   qs,
-  qsAll
+  qsAll,
+  debug
 }
