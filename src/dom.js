@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
 import elementTypes from './elements.json'
 import { on } from './emitter'
 
@@ -8,8 +7,6 @@ elementTypes.map(element => {
   DOM[element] = (props = {}, children) => {
     let el = Object.assign(document.createElement(element), { ...props })
     let fragment = document.createDocumentFragment()
-
-    el.mId = !('mId' in props) ? uuidv4() : props.mId
 
     if (Array.isArray(children)) {
       children.flatMap(c => fragment.appendChild(c))

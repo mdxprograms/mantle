@@ -1,6 +1,6 @@
 {
   "name": "@wallerbuilt/mantle",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "An event-driven Javascript library",
   "main": "dist/index.js",
   "repository": "https://github.com/mdxprograms/mantle",
@@ -9,6 +9,7 @@
     "start": "parcel watch src/index.js",
     "start:people": "parcel examples/people/index.html -p 3000 --out-dir examples/dist --open",
     "build": "rm -rf dist && parcel build src/index.js --no-source-maps --global @wallerbuilt/mantle",
+    "prepublish": "npm run test",
     "fix:scripts": "eslint --fix src/",
     "cypress": "cypress open",
     "test": "ava --verbose",
@@ -17,7 +18,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run fix:scripts"
+      "pre-commit": "npm run fix:scripts && npm run build"
     }
   },
   "keywords": [
