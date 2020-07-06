@@ -107,6 +107,66 @@ Mantle comes with three main concepts:
     mount(document.getElementById("app"), App([Intro]))
     ```
 
+### Helper methods for easier DOM manipulation
+- **append** -> append child element to target element
+  ```javascript
+  append(li({}, 'List Item'))(el)
+  ```
+
+- **clear** -> clear all child elements on target element
+  ```javascript
+  clear(el)
+  ```
+
+- **compose** -> curried composition to use with most helper functions
+  ```javascript
+  // get text of first span element in el
+  compose(getText, qs('span'))(el)
+  ```
+
+- **getProp** -> get attribute property from target element
+  ```javascript
+  getProp('data-title')(el)
+  ```
+
+- **setProp** -> set attribute property on target element
+  ```javascript
+  setProp('disabled', true)(el)
+  ```
+
+- **remove** -> remove child element from target element
+  ```javascript
+  remove(child)(el)
+  ```
+
+- **setStyle** -> Set an elements style properties
+  ```javascript
+  setStyle([
+    ['background', 'orange'],
+    ['fontSize', '18px']
+  ])(el)
+  ```
+
+- **getText** -> get `textContent` or `innerText` of element
+  ```javascript
+  getText(el)
+  ```
+
+- **setText** -> set `textContent` or `innerText` of element
+  ```javascript
+  setText('hello text')(el)
+  ```
+
+- **qs** -> query selector from target element
+  ```javascript
+  qs('span')(el)
+  ```
+
+- **qsAll** -> query all selectors from target element
+  ```javascript
+  qsAll('li')(ul)
+  ```
+
 ## Development Setup
 - `nvm install && nvm use`
 - `npm i`
