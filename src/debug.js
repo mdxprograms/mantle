@@ -1,11 +1,10 @@
-
 import { on } from './emitter'
 import DOM from './dom'
 import { append, setStyle } from './helpers'
 
 const { div, ul, li } = DOM
 
-const widget = setStyle([
+const widgetStyles = [
   ['background', '#ddd'],
   ['border-top-left-radius', '4px'],
   ['bottom', 0],
@@ -17,21 +16,23 @@ const widget = setStyle([
   ['padding', '0 10px'],
   ['position', 'absolute'],
   ['right', 0]
-])(div({}, []))
+]
+
+const widget = setStyle(widgetStyles)(div({}, []))
 
 const NewEntryValue = (key, val) =>
-  setStyle([
-    ['padding', '5px 8px']
-  ])(li({}, `${key}: ${val}`))
+  setStyle([['padding', '5px 8px']])(li({}, `${key}: ${val}`))
+
+const newEntryStyles = [
+  ['background', '#fff'],
+  ['border-radius', '4px'],
+  ['padding', '0 5px 5px 0'],
+  ['list-style', 'none'],
+  ['transition', 'all 200ms ease-in']
+]
 
 const NewEntry = (evtName, payload, timestamp) =>
-  setStyle([
-    ['background', '#fff'],
-    ['border-radius', '4px'],
-    ['padding', '0 5px 5px 0'],
-    ['list-style', 'none'],
-    ['transition', 'all 200ms ease-in']
-  ])(
+  setStyle(newEntryStyles)(
     ul({}, [
       NewEntryValue('Event', evtName),
       NewEntryValue('Payload', payload),
