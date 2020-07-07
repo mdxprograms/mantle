@@ -13,7 +13,7 @@ import {
   qs,
   qsAll
 } from './helpers'
-import debug from './debug'
+import debug from './debug/index'
 
 const mount = (el, container) => {
   el.appendChild(container)
