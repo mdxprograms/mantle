@@ -8,8 +8,6 @@ const { div, button } = DOM
 
 const withStyle = setStyle(widgetStyles)
 
-const map = (predicate) => (array) => array.map(predicate)
-
 const widget = withStyle(
   div({}, [
     button({}, 'Clear').on({
