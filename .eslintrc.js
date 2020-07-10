@@ -11,5 +11,11 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 11,
     sourceType: 'module'
+  },
+  rules: {
+    semi: ['error', 'never'],
+    'comma-dangle': ['error', 'never'],
+    quotes: ['error', 'single'],
+    indent: ['error', 2]
   }
 }
