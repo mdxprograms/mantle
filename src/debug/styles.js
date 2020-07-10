@@ -5,12 +5,11 @@ const widgetStyles = [
   ['box-shadow', '0 1px 4px #444'],
   ['color', '#222'],
   ['font-size', '20px'],
-  ['height', '100vh'],
-  ['max-width', '300px'],
-  ['overflow-y', 'scroll'],
+  ['left', 0],
+  ['overflow-x', 'scroll'],
   ['padding', '0 10px'],
   ['position', 'absolute'],
-  ['right', 0]
+  ['max-width', '100vw']
 ]
 
 export default widgetStyles

@@ -1,6 +1,6 @@
 import { on } from '../emitter'
 import DOM from '../dom'
-import { append, compose, setStyle, remove, qsAll, clear } from '../helpers'
+import { append, compose, setStyle, remove, qsAll, qs, clear } from '../helpers'
 import NewEntry from './NewEntry'
 import widgetStyles from './styles'
 
@@ -8,13 +8,23 @@ const { div, button } = DOM
 
 const withStyle = setStyle(widgetStyles)
 
+const DebugList = setStyle([
+  ['align-items', 'stretch'],
+  ['display', 'flex'],
+  ['flex-direction', 'row'],
+  ['flex-wrap', 'no-wrap'],
+  ['justify-content', 'space-around'],
+  ['height', '100%']
+])(div({ id: 'debug-list' }, []))
+
 const widget = withStyle(
   div({}, [
     button({}, 'Clear').on({
       click() {
-        qsAll('ul')(widget).forEach((x) => remove(x)(widget))
+        clear(DebugList)
       }
-    })
+    }),
+    DebugList
   ])
 )
 
@@ -34,7 +44,7 @@ export const debug = (name = '', element) => {
     ['*']: (el, evtName, payload) => {
       flashElement(el)
       append(NewEntry(`${event.type} -> ${evtName} -> ${name}`, payload, 0))(
-        widget
+        DebugList
       )
     }
   })
