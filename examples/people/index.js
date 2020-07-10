@@ -20,7 +20,7 @@ const PersonList = ul({ className: 'list pl0 mt4' }, []).when({
   ['person:added']: (self, val) => append(PersonListItem(val))(self),
   ['person:removed']: (self, child) => remove(child)(self)
 })
-debug()
+debug('PersonList', PersonList)
 
 const App = main(
   { id: 'app-root' },
