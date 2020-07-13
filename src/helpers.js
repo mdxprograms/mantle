@@ -72,6 +72,20 @@ export const append = element => target => {
 }
 
 /**
+ * @name prepend
+ * @param  {HTMLElement} element
+ * @param {HTMLElement} target
+ * @description Appends node to parent target
+ * @example
+ * append(li({}, 'child'))(ul({}, []))
+ * @return {HTMLElement} target
+ */
+export const prepend = element => target => {
+  target.prepend(element)
+  return target
+}
+
+/**
  * @name remove
  * @param {HTMLElement} element
  * @param {HTMLElement} target

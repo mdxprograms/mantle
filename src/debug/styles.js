@@ -1,15 +1,16 @@
 const widgetStyles = [
-  ['background', '#ddd'],
-  ['border-top-left-radius', '4px'],
+  ['align-items', 'flex-start'],
+  ['background', '#f7f7f7'],
   ['bottom', 0],
   ['box-shadow', '0 1px 4px #444'],
   ['color', '#222'],
+  ['display', 'flex'],
   ['font-size', '20px'],
   ['left', 0],
   ['overflow-x', 'scroll'],
-  ['padding', '0 10px'],
+  ['padding', '30px'],
   ['position', 'absolute'],
-  ['max-width', '100vw']
+  ['width', '100vw']
 ]
 
 export default widgetStyles
