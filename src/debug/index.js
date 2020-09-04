@@ -1,19 +1,10 @@
 import { on } from '../emitter'
 import DOM from '../dom'
-import {
-  prepend,
-  compose,
-  setStyle,
-  remove,
-  qsAll,
-  qs,
-  clear
-} from '../helpers'
+import { prepend, setStyle, clear } from '../helpers'
 import NewEntry from './NewEntry'
 import {
   withBtnStyle,
   withFlashStyle,
-  withH4Style,
   withWidgetStyle,
   withListStyle,
   onClearBtnEnter,
@@ -53,7 +44,7 @@ const flashElement = (element) => {
   }, 1000)
 }
 
-export function debug(name = '', element) {
+export const debug = (name = '', element) => {
   element.when({
     ['*']: (el, evtName) => {
       flashElement(el)
