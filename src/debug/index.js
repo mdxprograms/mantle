@@ -1,94 +1,73 @@
 import { on } from '../emitter'
 import DOM from '../dom'
-import { prepend, compose, setStyle, remove, qsAll, qs, clear } from '../helpers'
+import {
+  prepend,
+  compose,
+  setStyle,
+  remove,
+  qsAll,
+  qs,
+  clear
+} from '../helpers'
 import NewEntry from './NewEntry'
-import widgetStyles from './styles'
+import {
+  withBtnStyle,
+  withFlashStyle,
+  withH4Style,
+  withWidgetStyle,
+  withListStyle,
+  onClearBtnEnter,
+  onClearBtnLeave
+} from './styles'
 
-const { div, button, h4 } = DOM
+const { div, button } = DOM
 
-const withStyle = setStyle(widgetStyles)
+const DebugList = withListStyle(div({ id: 'debug-list' }, []))
 
-const onClearBtnEnter = setStyle([
-  ['background', '#f45'],
-  ['color', '#f7f7f7'],
-  ['box-shadow', '0 0 4px #666']
-])
-
-const onClearBtnLeave = setStyle([
-  ['background', '#f78'],
-  ['color', '#fff']
-])
-
-const DebugList = setStyle([
-  ['align-items', 'flex-start'],
-  ['display', 'flex'],
-  ['flex-direction', 'row'],
-  ['flex-wrap', 'no-wrap']
-])(div({ id: 'debug-list' }, []))
-
-const ClearBtn = () => {
-  const withBtnStyle = setStyle([
-    ['align-self', 'flex-start'],
-    ['background', '#f78'],
-    ['border', 'none'],
-    ['box-shadow', '0 0 2px #666'],
-    ['color', '#fff'],
-    ['cursor', 'pointer'],
-    ['margin', '0 0 0 10px'],
-    ['padding', '2px 5px 5px'],
-    ['transition', 'all 200ms ease-in-out']
-  ])
-
-  return withBtnStyle(
-    button({}, 'clear').on({
-      click() {
-        clear(DebugList)
-      },
-      mouseenter() {
-        onClearBtnEnter(this)
-      },
-      mouseleave() {
-        onClearBtnLeave(this)
-      }
-    })
-  )
-}
-
-const widget = withStyle(
-  div({}, [
-    setStyle([['margin', '0 10px 0 0']])(h4({}, 'debug')),
-    ClearBtn(),
-    DebugList
-  ])
+const ClearBtn = withBtnStyle(
+  button({}, 'clear').on({
+    click() {
+      clear(DebugList)
+      hideClearBtn()
+    },
+    mouseenter() {
+      onClearBtnEnter(this)
+    },
+    mouseleave() {
+      onClearBtnLeave(this)
+    }
+  })
 )
 
+const hideClearBtn = () => setStyle([['display', 'none']])(ClearBtn)
+
+const showClearBtn = () => setStyle([['display', 'block']])(ClearBtn)
+
+const Widget = () => withWidgetStyle(div({}, [ClearBtn, DebugList]))
+
 const flashElement = (element) => {
-  setStyle([
-    ['box-shadow', '0 0 5px tomato'],
-    ['transition', 'box-shadow 200ms ease']
-  ])(element)
+  withFlashStyle(element)
 
   setTimeout(() => {
     setStyle([['box-shadow', 'none']])(element)
   }, 1000)
 }
 
-export const debug = (name = '', element) => {
+export function debug(name = '', element) {
   element.when({
-    ['*']: (el, evtName, payload) => {
+    ['*']: (el, evtName) => {
       flashElement(el)
-      prepend(
-        NewEntry(`${event.type} -> ${evtName} -> ${name}`, payload || null, 0)
-      )(DebugList)
+      prepend(NewEntry(event.type, evtName, el))(DebugList)
+      showClearBtn()
     }
   })
 }
 
 const globalDebug = () =>
-  on('*', (evtName, payload, timestamp) =>
-    prepend(NewEntry(evtName, payload, timestamp))(widget)
+  on('*', (evtName) =>
+    prepend(NewEntry('global', evtName, event.target))(Widget())
   )
 
-document.body.appendChild(widget)
+document.body.appendChild(Widget())
 
 export default globalDebug
