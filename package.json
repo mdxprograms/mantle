@@ -1,14 +1,16 @@
 {
   "name": "@wallerbuilt/mantle",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "description": "An event-driven Javascript library",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
   "repository": "https://github.com/mdxprograms/mantle",
   "private": false,
   "scripts": {
-    "start": "parcel watch src/index.js",
+    "start": "rollup -c -w",
     "start:people": "parcel examples/people/index.html -p 3000 --out-dir examples/dist --open",
-    "build": "rm -rf dist && parcel build src/index.js --no-source-maps --global @wallerbuilt/mantle",
+    "build": "rollup -c",
     "prepublish": "npm run test",
     "fix:scripts": "eslint --fix src/",
     "cypress": "cypress open",
@@ -21,6 +23,9 @@
       "pre-commit": "npm run fix:scripts && npm run build"
     }
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "javascript",
     "javascript-library",
@@ -34,6 +39,8 @@
     "@babel/cli": "^7.10.3",
     "@babel/core": "^7.10.3",
     "@babel/plugin-transform-runtime": "^7.10.3",
+    "@rollup/plugin-commonjs": "^17.0.0",
+    "@rollup/plugin-node-resolve": "^11.0.1",
     "ava": "^3.9.0",
     "browser-env": "^3.3.0",
     "cypress": "^4.5.0",
@@ -41,7 +48,7 @@
     "esm": "^3.2.25",
     "husky": "^4.2.5",
     "nyc": "^15.1.0",
-    "parcel-bundler": "^1.12.4"
+    "rollup": "^2.35.1"
   },
   "dependencies": {
     "@babel/runtime": "^7.10.3",
