@@ -4,7 +4,6 @@ module.exports = {
     browser: true,
     es6: true
   },
-  extends: 'eslint:recommended',
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly'
@@ -14,11 +13,9 @@ module.exports = {
     sourceType: 'module'
   },
   rules: {
-    indent: ['error', 2],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
     semi: ['error', 'never'],
     'comma-dangle': ['error', 'never'],
-    'arrow-parens': ['error', 'as-needed']
+    quotes: ['error', 'single'],
+    indent: ['error', 2]
   }
 }

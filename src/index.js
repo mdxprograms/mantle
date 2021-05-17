@@ -6,6 +6,7 @@ import {
   getProp,
   compose,
   append,
+  prepend,
   remove,
   clear,
   setText,
@@ -13,6 +14,7 @@ import {
   qs,
   qsAll
 } from './helpers'
+import globalDebug, { debug } from './debug/index'
 
 const mount = (el, container) => {
   el.appendChild(container)
@@ -27,10 +29,13 @@ export {
   getProp,
   compose,
   append,
+  prepend,
   remove,
   clear,
   setText,
   getText,
   qs,
-  qsAll
+  qsAll,
+  globalDebug,
+  debug
 }

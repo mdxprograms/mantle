@@ -1,4 +1,4 @@
-import { DOM, dispatch } from '../../src'
+import { DOM, dispatch, debug } from '../../src'
 
 const { input, div, button } = DOM
 
@@ -24,6 +24,8 @@ const AddPersonButton = button(
 ).on({
   click: () => dispatch('person:added', PersonInput.value)
 })
+
+debug('AddPersonButton', AddPersonButton)
 
 const NewPersonForm = div({ className: 'new-person-form' }, [
   PersonInput,
